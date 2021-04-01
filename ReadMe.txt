@@ -1,16 +1,7 @@
-Cards basic WCF example #3 (COMPLETE) - INFO-5060, Winter 2021
+Kahoot Multiplayer - INFO-5060, Winter 2021
 --------------------------------------------------------------
 
-Mar 23, 2021
-
-Example:	Using Card as a data contract and administrative endpoints
-			defined in the App.config files (WCF example #2)
-
-This WCF example is now COMPLETE. It defines a new type of service contract, 
-often referred to as a callback contract, called ICallback. This contract is 
-implemented by the client's MainWindow class and its UpdateClient() method is 
-called by the Shoe service object whenever a live update is needed because 
-the state of the Shoe object changed.
+Mar 31, 2021
 
 How to Run the Example:
 
@@ -21,4 +12,4 @@ How to Run the Example:
 	click on the "Start" button in the toolbar.
 3.	To execte multiple instances of the client it may work better to launch
 	the client outside of Visual Studio by double clicking on the file
-	CardsGUIClient\bin\Debug\CardsGUIClient.exe.
+	KahootGUIClient\bin\Debug\KahootGUIClient.exe.
