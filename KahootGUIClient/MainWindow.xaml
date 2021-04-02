@@ -5,11 +5,11 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CardsGUIClient"
         mc:Ignorable="d"
-        Title="My Cards" Height="350" Width="525" ResizeMode="CanMinimize" WindowStartupLocation="CenterScreen" Closing="Window_Closing">
+        Title="Kahoot!" Height="475" Width="700" ResizeMode="CanMinimize" WindowStartupLocation="CenterScreen" Closing="Window_Closing">
     <Grid RenderTransformOrigin="0.5,0.5">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition/>
-            <ColumnDefinition/>
+            <ColumnDefinition Width="373*"/>
+            <ColumnDefinition Width="296*"/>
         </Grid.ColumnDefinitions>
         <Grid.RenderTransform>
             <TransformGroup>
@@ -18,15 +18,12 @@
                 <TranslateTransform/>
             </TransformGroup>
         </Grid.RenderTransform>
-        <ListBox x:Name="lstCards" HorizontalAlignment="Center" Height="269" Margin="0,27,0,0" VerticalAlignment="Top" Width="206"/>
-        <Label Content="Cards in Hand" HorizontalAlignment="Center" Height="26" Margin="0,2,0,0" VerticalAlignment="Top" Width="206"/>
-        <Button x:Name="btnDraw" Content="Draw" Grid.Column="1" HorizontalAlignment="Center" Height="35" Margin="0,27,0,0" VerticalAlignment="Top" Width="185" Click="btnDraw_Click"/>
-        <Button x:Name="btnShuffle" Content="Shuffle" Grid.Column="1" HorizontalAlignment="Center" Height="35" Margin="0,70,0,0" VerticalAlignment="Top" Width="185" Click="btnShuffle_Click"/>
-        <Button x:Name="btnClose" Content="Close" Grid.Column="1" HorizontalAlignment="Center" Height="32" Margin="0,265,0,0" VerticalAlignment="Top" Width="185" Click="btnClose_Click"/>
-        <Slider x:Name="sliderDecks" IsSnapToTickEnabled="True" Grid.Column="1" HorizontalAlignment="Center" Margin="0,110,0,0" VerticalAlignment="Top" Width="185" Minimum="1" SmallChange="1" TickPlacement="BottomRight" ValueChanged="sliderDecks_ValueChanged"/>
-        <TextBox x:Name="txtDeckCount" Grid.Column="1" HorizontalAlignment="Center" Height="23" Margin="0,137,0,0" TextWrapping="Wrap" Text="1 Deck" VerticalAlignment="Top" Width="82" BorderThickness="0" HorizontalContentAlignment="Center"/>
-        <GroupBox Grid.Column="1" Header="Card Counts" HorizontalAlignment="Center" Height="87" Margin="0,160,0,0" VerticalAlignment="Top" Width="185">
-            <Grid HorizontalAlignment="Left" Height="69" Margin="0,0,-2,-4" VerticalAlignment="Top" Width="175">
+        <Label x:Name="labelGameStatus" Content="Waiting for everyone..." HorizontalContentAlignment="Center" Height="26" Margin="90,6,91,0" VerticalAlignment="Top"/>
+        <Label Content="Time Left:" HorizontalAlignment="Center"  Height="24" Margin="236,68,86,354" VerticalAlignment="Center" Width="65"/>
+        <TextBox x:Name="txtTimer" HorizontalAlignment="Center" Height="19" Margin="306,72,25,355" TextWrapping="Wrap" Text="15s" VerticalAlignment="Center" Width="56"/>
+        <Label x:Name="labelCurrentQuestion" Content="Question?" HorizontalContentAlignment="Center" HorizontalAlignment="Center" Height="26" Margin="90,121,91,0" VerticalAlignment="Top" Width="206"/>
+        <GroupBox Height="318" Margin="19,96,20,0" VerticalAlignment="Top">
+            <Grid Margin="0,119,3,-2">
                 <Grid.RowDefinitions>
                     <RowDefinition/>
                     <RowDefinition/>
@@ -35,11 +32,32 @@
                     <ColumnDefinition/>
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
-                <Label Content="Hand" HorizontalAlignment="Center" Height="23" Margin="0" VerticalAlignment="Center" Width="51"/>
-                <Label Content="Shoe" HorizontalAlignment="Center" Height="29" Margin="0" VerticalAlignment="Center" Width="51" Grid.Row="1"/>
-                <TextBox x:Name="txtHandCount" Grid.Column="1" HorizontalAlignment="Center" Height="24" Margin="0" TextWrapping="Wrap" Text="0" VerticalAlignment="Center" Width="63"/>
-                <TextBox x:Name="txtShoeCount" HorizontalAlignment="Center" Height="29" Margin="0" TextWrapping="Wrap" Text="0" VerticalAlignment="Center" Width="65" Grid.Column="1" Grid.Row="1"/>
+                <Button x:Name="buttonAnswerA" Content="A" HorizontalAlignment="Center" Height="32" Margin="18,31,20,0" VerticalAlignment="Top" Width="129" Click="btnAnswer_Click"/>
+                <Button x:Name="buttonAnswerB" Content="B" HorizontalAlignment="Center" Height="32" Margin="19,31,18,0" VerticalAlignment="Top" Width="129" Click="btnAnswer_Click" Grid.Column="1"/>
+                <Button x:Name="buttonAnswerC" Content="C" HorizontalAlignment="Center" Height="32" Margin="18,31,20,0" VerticalAlignment="Top" Width="129" Click="btnAnswer_Click" Grid.Row="1"/>
+                <Button x:Name="buttonAnswerD" Content="D" HorizontalAlignment="Center" Height="32" Margin="19,31,18,0" VerticalAlignment="Top" Width="129" Click="btnAnswer_Click" Grid.Column="1" Grid.Row="1"/>
             </Grid>
         </GroupBox>
+        <GroupBox Grid.Column="1" Header="Game Rules" HorizontalAlignment="Center" Height="139" Margin="25,10,35,0" VerticalAlignment="Top" Width="236">
+            <Grid HorizontalAlignment="Left" Height="69" Margin="0,0,0,-1" VerticalAlignment="Top" Width="221">
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Label Content="Time per Q." HorizontalAlignment="Center" Height="28" Margin="2,3,10,3" VerticalAlignment="Center" Width="76"  Grid.Row="1"/>
+                <Label Content="Categories" HorizontalAlignment="Center" Height="28" Margin="2,3,10,3" VerticalAlignment="Center" Width="76"/>
+                <TextBox x:Name="txtTimePerQuestion" Grid.Column="1" HorizontalAlignment="Center" Height="24" Margin="10,3" TextWrapping="Wrap" Text="15" VerticalAlignment="Center" Width="90"  Grid.Row="1"/>
+                <ListBox x:Name="txtShoeCount" SelectionMode="Extended" HorizontalAlignment="Center" Height="24" Margin="10,3" VerticalAlignment="Center" Width="90" Grid.Column="1"/>
+            </Grid>
+        </GroupBox>
+        <Slider x:Name="sliderQuestions" IsSnapToTickEnabled="True" Grid.Column="1" HorizontalAlignment="Center" Margin="50,102,60,0" VerticalAlignment="Top" Width="186" Minimum="1" SmallChange="1" TickPlacement="BottomRight" ValueChanged="sliderQuestions_ValueChanged" Height="24"/>
+        <TextBox x:Name="txtQuestionCount" Grid.Column="1" HorizontalAlignment="Center" Height="23" Margin="99,126,115,0" TextWrapping="Wrap" Text="1 Question" VerticalAlignment="Top" Width="82" BorderThickness="0" HorizontalContentAlignment="Center"/>
+        <ListBox x:Name="lstPlayers" Grid.Column="1" HorizontalAlignment="Center" Height="196" Margin="47,160,54,0" VerticalAlignment="Top" Width="206"/>
+        <Button x:Name="btnReady" Content="Ready" Grid.Column="1" HorizontalAlignment="Center" Height="32" Margin="55,361,66,0" VerticalAlignment="Top" Width="186" Click="btnReady_Click"/>
+        <Button x:Name="btnStart" Content="Start Game" Grid.Column="1" HorizontalAlignment="Center" Height="32" Margin="55,398,66,0" VerticalAlignment="Top" Width="186" Click="btnStart_Click"/>
     </Grid>
 </Window>

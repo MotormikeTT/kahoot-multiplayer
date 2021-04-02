@@ -56,85 +56,143 @@ namespace CardsGUIClient
             shoe.RegisterForCallbacks();
 
             // Initialize the GUI
-            sliderDecks.Minimum = 1;
-            sliderDecks.Maximum = 10;
-            sliderDecks.Value = shoe.NumDecks;
-            updateCardCounts(false);
+            sliderQuestions.Minimum = 1;
+            sliderQuestions.Maximum = 20;
+            sliderQuestions.Value = shoe.NumDecks;
+            //updateCardCounts(false);
 
         } // end default C'tor
 
-
-        // Helper methods
-
-        private void updateCardCounts(bool emptyHand)
-        {
-            if (emptyHand)
-                // Only "throw out" drawn cards if the Shoe was shuffled 
-                // or the number of decks was changed
-                lstCards.Items.Clear();
-
-            txtHandCount.Text = lstCards.Items.Count.ToString();
-            txtShoeCount.Text = shoe.NumCards.ToString();
-        } // end updateCardCounts()
-
-        // Event handlers
-
-        private void btnDraw_Click(object sender, RoutedEventArgs e)
-        {
-            try 
-            {
-                Card card = shoe.Draw();
-
-                // Update the GUI
-                lstCards.Items.Insert(0, card);
-                updateCardCounts(false);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
-        } // end btnDraw_Click()
-
-        private void btnShuffle_Click(object sender, RoutedEventArgs e)
+        private void btnReady_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                shoe.Shuffle();
+                ///RUN SOMETHING
 
                 // Update the GUI
-                updateCardCounts(true);
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
             }
-        } // end btnShuffle_Click()
+        } // end btnReady_Click()
 
-        private void sliderDecks_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        private void btnStart_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                ///RUN SOMETHING
+
+                // Update the GUI
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        } // end btnStart_Click()
+
+        private void btnAnswer_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                ///RUN SOMETHING
+
+                // Update the GUI
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        } // end btnAnswer_Click()
+
+        private void sliderQuestions_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             try
             {
                 if (shoe != null)
                 {
-                    // Reset the number of decks
-                    shoe.NumDecks = (int)sliderDecks.Value;
+
 
                     // Update the GUI
-                    updateCardCounts(true);
-                    int n = shoe.NumDecks;
-                    txtDeckCount.Text = n + " deck" + (n == 1 ? "" : "s");
                 }
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
             }
-        } // end sliderDecks_ValueChanged()
+        } // end sliderQuestions_ValueChanged()
 
-        private void btnClose_Click(object sender, RoutedEventArgs e)
-        {
-            this.Close();
-        } // end btnClose_Click()
+        // Helper methods
+
+        //private void updateCardCounts(bool emptyHand)
+        //{
+        //    if (emptyHand)
+        //        // Only "throw out" drawn cards if the Shoe was shuffled 
+        //        // or the number of decks was changed
+        //        lstCards.Items.Clear();
+
+        //    txtHandCount.Text = lstCards.Items.Count.ToString();
+        //    txtShoeCount.Text = shoe.NumCards.ToString();
+        //} // end updateCardCounts()
+
+        //// Event handlers
+
+        //private void btnDraw_Click(object sender, RoutedEventArgs e)
+        //{
+        //    try 
+        //    {
+        //        Card card = shoe.Draw();
+
+        //        // Update the GUI
+        //        lstCards.Items.Insert(0, card);
+        //        updateCardCounts(false);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        MessageBox.Show(ex.Message);
+        //    }
+        //} // end btnDraw_Click()
+
+        //private void btnShuffle_Click(object sender, RoutedEventArgs e)
+        //{
+        //    try
+        //    {
+        //        shoe.Shuffle();
+
+        //        // Update the GUI
+        //        updateCardCounts(true);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        MessageBox.Show(ex.Message);
+        //    }
+        //} // end btnShuffle_Click()
+
+        //private void sliderDecks_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        //{
+        //    try
+        //    {
+        //        if (shoe != null)
+        //        {
+        //            // Reset the number of decks
+        //            shoe.NumDecks = (int)sliderDecks.Value;
+
+        //            // Update the GUI
+        //            updateCardCounts(true);
+        //            int n = shoe.NumDecks;
+        //            txtDeckCount.Text = n + " deck" + (n == 1 ? "" : "s");
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        MessageBox.Show(ex.Message);
+        //    }
+        //} // end sliderDecks_ValueChanged()
+
+        //private void btnClose_Click(object sender, RoutedEventArgs e)
+        //{
+        //    this.Close();
+        //} // end btnClose_Click()
 
 
         private delegate void ClientUpdateDelegate(CallbackInfo info);
@@ -144,14 +202,14 @@ namespace CardsGUIClient
             if (System.Threading.Thread.CurrentThread == this.Dispatcher.Thread)
             {
                 // Update the GUI
-                txtShoeCount.Text = info.NumCards.ToString();
-                sliderDecks.Value = info.NumDecks;
-                txtDeckCount.Text = info.NumDecks + " deck" + (info.NumDecks == 1 ? "" : "s");
-                if (info.EmptyTheHand)
-                {
-                    lstCards.Items.Clear();
-                    txtHandCount.Text = "0";
-                }
+                //txtShoeCount.Text = info.NumCards.ToString();
+                //sliderDecks.Value = info.NumDecks;
+                //txtDeckCount.Text = info.NumDecks + " deck" + (info.NumDecks == 1 ? "" : "s");
+                //if (info.EmptyTheHand)
+                //{
+                //    lstCards.Items.Clear();
+                //    txtHandCount.Text = "0";
+                //}
             }
             else
             {
