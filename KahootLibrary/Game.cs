@@ -235,7 +235,7 @@ namespace KahootLibrary
             // Prepare the CallbackInfo parameter
             CallbackGameRulesInfo info = new CallbackGameRulesInfo(players, category, numQuestions, timePerQuestion, ready, gameHost);
 
-            // Update all clients except thisClient
+            // Update all clients
             foreach (ICallback cb in callbacks)
                 cb.UpdateGameRules(info);
         }

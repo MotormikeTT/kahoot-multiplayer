@@ -60,6 +60,7 @@ namespace CardsGUIClient
             sliderQuestions.Maximum = 20;
             sliderQuestions.Value = game.NumQuestions;
             txtCategories.ItemsSource = game.Categories;
+            btnStart.Visibility = Visibility.Hidden;
             //updateCardCounts(false);
 
         } // end default C'tor
@@ -266,8 +267,11 @@ namespace CardsGUIClient
                 txtTimer.Text = $"{info.TimePerQuestion}s";
                 txtCategories.Text = info.Category;
                 lstPlayers.ItemsSource = info.Players;
-                btnStart.Visibility = info.GameHost ? Visibility.Visible : Visibility.Hidden;
-                btnReady.Visibility = info.GameHost ? Visibility.Hidden : Visibility.Visible;
+                if (info.GameHost)
+                {
+                    btnStart.Visibility = Visibility.Visible;
+                    btnReady.Visibility = Visibility.Hidden;
+                }
             }
             else
             {
