@@ -51,7 +51,7 @@
                 <Label Content="Time per Q." HorizontalAlignment="Center" Height="28" Margin="2,3,10,3" VerticalAlignment="Center" Width="76"  Grid.Row="1"/>
                 <Label Content="Categories" HorizontalAlignment="Center" Height="28" Margin="2,3,10,3" VerticalAlignment="Center" Width="76"/>
                 <TextBox x:Name="txtTimePerQuestion" Grid.Column="1" HorizontalAlignment="Center" Height="24" Margin="10,3" TextWrapping="Wrap" Text="15" VerticalAlignment="Center" Width="90"  Grid.Row="1" TextChanged="txtTimePerQuestion_TextChanged"/>
-                <ComboBox x:Name="txtCategories" HorizontalAlignment="Center" Height="24" Margin="10,3" VerticalAlignment="Center" Width="90" Grid.Column="1" SelectionChanged="txtCategories_SelectionChanged"/>
+                <ComboBox x:Name="comboCategories" HorizontalAlignment="Center" Height="24" Margin="10,3" VerticalAlignment="Center" Width="90" Grid.Column="1" SelectionChanged="comboCategories_SelectionChanged"/>
             </Grid>
         </GroupBox>
         <Slider x:Name="sliderQuestions" IsSnapToTickEnabled="True" Grid.Column="1" HorizontalAlignment="Center" Margin="50,102,60,0" VerticalAlignment="Top" Width="186" Minimum="1" SmallChange="1" TickPlacement="BottomRight" ValueChanged="sliderQuestions_ValueChanged" Height="24"/>

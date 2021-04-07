@@ -59,7 +59,7 @@ namespace CardsGUIClient
             sliderQuestions.Minimum = 1;
             sliderQuestions.Maximum = 20;
             sliderQuestions.Value = game.NumQuestions;
-            txtCategories.ItemsSource = game.Categories;
+            comboCategories.ItemsSource = game.Categories;
             btnStart.Visibility = Visibility.Hidden;
             //updateCardCounts(false);
 
@@ -128,16 +128,13 @@ namespace CardsGUIClient
         } // end sliderQuestions_ValueChanged()
 
 
-        private void txtCategories_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        private void comboCategories_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         {
             try
             {
                 if (game != null)
                 {
                     game.Category = sender.ToString();
-
-                    // update GUI
-                    txtQuestionCount.Text = $"{sliderQuestions.Value} Questions";
                 }
             }
             catch (Exception ex)
@@ -234,7 +231,6 @@ namespace CardsGUIClient
         //} // end btnClose_Click()
 
 
-        private delegate void ClientUpdateDelegate(CallbackGameRulesInfo info);
 
         public void UpdateClient(CallbackGameRulesInfo info)
         {
@@ -257,6 +253,8 @@ namespace CardsGUIClient
             }
         }
 
+        private delegate void ClientUpdateDelegate(CallbackGameRulesInfo info);
+
         public void UpdateGameRules(CallbackGameRulesInfo info)
         {
             if (System.Threading.Thread.CurrentThread == this.Dispatcher.Thread)
@@ -265,7 +263,7 @@ namespace CardsGUIClient
                 txtQuestionCount.Text = $"{info.NumQuestions} Questions";
                 txtTimePerQuestion.Text = info.TimePerQuestion.ToString();
                 txtTimer.Text = $"{info.TimePerQuestion}s";
-                txtCategories.Text = info.Category;
+                comboCategories.Text = info.Category;
                 lstPlayers.ItemsSource = info.Players;
                 if (info.GameHost)
                 {
