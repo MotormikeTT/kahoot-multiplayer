@@ -27,9 +27,9 @@ namespace KahootLibrary
     public interface ICallback
     {
         [OperationContract(IsOneWay = true)]
-        void UpdateGameRules(CallbackInfo info);
+        void UpdateGameRules(CallbackGameRulesInfo info);
         [OperationContract(IsOneWay = true)]
-        void UpdateClient(CallbackInfo info);
+        void UpdateClient(CallbackGameRulesInfo info);
     }
 
     // Converted IShoe to a WCF service contract
@@ -40,8 +40,11 @@ namespace KahootLibrary
         void StartGame();*/
         [OperationContract]
         Question GetQuestion();
+        [OperationContract]
+        void RegisterPlayer(string playerName);
         int NumQuestions { [OperationContract] get; [OperationContract(IsOneWay = true)] set; }
         string Category { [OperationContract] get; [OperationContract(IsOneWay = true)] set; }
+        List<string> Categories { [OperationContract] get; }
         int TimePerQuestion { [OperationContract] get; [OperationContract(IsOneWay = true)] set; }
         [OperationContract(IsOneWay = true)]
         void RegisterForCallbacks();
@@ -64,6 +67,8 @@ namespace KahootLibrary
         private int numQuestions;               // number of decks in the shoe
         private int timePerQuestion;
         private string category;
+        private List<string> categories;
+        private bool gameHost;
 
         private HashSet<ICallback> callbacks = new HashSet<ICallback>();
 
@@ -74,9 +79,12 @@ namespace KahootLibrary
             Console.WriteLine($"Creating Game object");
 
             questions = new List<Question>();
+            players = new List<Player>();
             numQuestions = 5;
-            category = "brain-teasers";
-            populate();
+            timePerQuestion = 15;
+            //category = "brain-teasers";
+            // populate with catgories from files
+            categories = new List<string>(Directory.GetFiles(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), $@".\categories\")));
         }
 
         /*------------------ Public properties and methods -----------------*/
@@ -91,7 +99,7 @@ namespace KahootLibrary
             // Reset the cards index
             questionIdx = 0;
 
-            updateClients(true);
+            updateUpdateGameRules(true);
         }
 
         // Returns a copy of the next Card in the cards collection
@@ -102,9 +110,18 @@ namespace KahootLibrary
 
             Question question = questions[questionIdx++];
 
-            updateClients(false);
+            updateUpdateGameRules(false);
 
             return question;
+        }
+
+        public void RegisterPlayer(string playerName)
+        {
+            Player player = new Player(playerName);
+            if(!players.Contains(player))
+                players.Add(player);
+
+            updateUpdateGameRules(false);
         }
 
         // Lets the client read or modify the number of decks in the shoe
@@ -119,7 +136,7 @@ namespace KahootLibrary
                 if (numQuestions != value)
                 {
                     numQuestions = value;
-                    populate();
+                    updateUpdateGameRules(false);
                 }
             }
         }
@@ -136,8 +153,18 @@ namespace KahootLibrary
                 if (category != value)
                 {
                     category = value;
+
                     populate();
+                    updateUpdateGameRules(false);
                 }
+            }
+        }
+
+        public List<string> Categories
+        {
+            get
+            {
+                return categories;
             }
         }
 
@@ -152,7 +179,7 @@ namespace KahootLibrary
                 if (timePerQuestion != value)
                 {
                     timePerQuestion = value;
-                    populate();
+                    updateUpdateGameRules(false);
                 }
             }
         }
@@ -165,6 +192,9 @@ namespace KahootLibrary
             // Add client's callback object to the collection
             if (!callbacks.Contains(cb))
                 callbacks.Add(cb);
+
+            gameHost = callbacks.Count == 1;
+            updateUpdateGameRules(false);
         }
 
         public void UnregisterFromCallbacks()
@@ -180,7 +210,7 @@ namespace KahootLibrary
 
         /*------------------------- Helper methods -------------------------*/
 
-        // Populates the cards attribute with Card objects and then shuffles it 
+        // Populates the cards attribute with Card objects
         private void populate()
         {
             string[] questions = File.ReadAllText(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), $@".\categories\{category}.txt")).Split(new string[] { "#Q " }, StringSplitOptions.None);
@@ -194,28 +224,20 @@ namespace KahootLibrary
                     listOfQuestions.Add(newQuestion);
                 }
             }
-
-            Shuffle();
         }
 
         // Uses the client callback objects to send current Shoe information 
         // to clients. If the change in teh Shoe state was triggered by a method call 
         // from a specific client, then that particular client will be excluded from
         // the update since it will already be updated directly by the call.
-        private void updateClients(bool restart)
+        private void updateUpdateGameRules(bool ready)
         {
-            // Identify which client just changed the Shoe object's state
-            ICallback thisClient = null;
-            if (OperationContext.Current != null)
-                thisClient = OperationContext.Current.GetCallbackChannel<ICallback>();
-
             // Prepare the CallbackInfo parameter
-            CallbackInfo info = new CallbackInfo(questions, numQuestions, timePerQuestion, restart);
+            CallbackGameRulesInfo info = new CallbackGameRulesInfo(players, category, numQuestions, timePerQuestion, ready, gameHost);
 
             // Update all clients except thisClient
             foreach (ICallback cb in callbacks)
-                if (thisClient == null || thisClient != cb)
-                    cb.UpdateClient(info);
+                cb.UpdateGameRules(info);
         }
 
 

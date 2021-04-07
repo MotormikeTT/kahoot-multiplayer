@@ -45,11 +45,11 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="categories\**">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-</ItemGroup>
+  </ItemGroup>
   <ItemGroup>
-    <Compile Include="CallbackInfo.cs" />
+    <Compile Include="CallbackGameRulesInfo.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Game.cs" />

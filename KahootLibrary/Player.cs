@@ -48,7 +48,7 @@ namespace KahootLibrary
 
         public override string ToString()
         {
-            return $"Player {Name} has {Points} points";
+            return $"Player {Name}\t {Points} points";
         }
 
     } // end Card class

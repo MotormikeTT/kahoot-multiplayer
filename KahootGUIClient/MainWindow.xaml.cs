@@ -23,7 +23,7 @@
 using System;
 using System.Windows;
 using System.ServiceModel;  // WCF  types
-using CardsLibrary;
+using KahootLibrary;
 
 namespace CardsGUIClient
 {
@@ -34,7 +34,7 @@ namespace CardsGUIClient
     public partial class MainWindow : Window, ICallback 
     {
         // Private member variables
-        private IShoe shoe = null;
+        private IGame game = null;
 
         // C'tor
         public MainWindow()
@@ -44,8 +44,8 @@ namespace CardsGUIClient
             // Note that the client no longer creates a Shoe object locally!
 
             // Connect to the WCF service endpoint 
-            DuplexChannelFactory<IShoe> channel = new DuplexChannelFactory<IShoe>(this, "ShoeEndPoint");
-            shoe = channel.CreateChannel();
+            DuplexChannelFactory<IGame> channel = new DuplexChannelFactory<IGame>(this, "KahootEndPoint");
+            game = channel.CreateChannel();
 
             // The variable "shoe" above does NOT reference a Shoe object 
             // directly. Instead it references a local "transparent proxy" object which 
@@ -53,12 +53,13 @@ namespace CardsGUIClient
             // all client requests to the service host application
 
             // Register for the callback service
-            shoe.RegisterForCallbacks();
+            game.RegisterForCallbacks();
 
             // Initialize the GUI
             sliderQuestions.Minimum = 1;
             sliderQuestions.Maximum = 20;
-            sliderQuestions.Value = shoe.NumDecks;
+            sliderQuestions.Value = game.NumQuestions;
+            txtCategories.ItemsSource = game.Categories;
             //updateCardCounts(false);
 
         } // end default C'tor
@@ -68,8 +69,9 @@ namespace CardsGUIClient
             try
             {
                 ///RUN SOMETHING
+                game.RegisterPlayer(txtPlayerName.Text);
 
-                // Update the GUI
+                // add to list of players
             }
             catch (Exception ex)
             {
@@ -82,6 +84,7 @@ namespace CardsGUIClient
             try
             {
                 ///RUN SOMETHING
+                game.RegisterPlayer(txtPlayerName.Text);
 
                 // Update the GUI
             }
@@ -109,11 +112,12 @@ namespace CardsGUIClient
         {
             try
             {
-                if (shoe != null)
+                if (game != null)
                 {
+                    game.NumQuestions = (int)sliderQuestions.Value;
 
-
-                    // Update the GUI
+                    // update GUI
+                    txtQuestionCount.Text = $"{sliderQuestions.Value} Questions";
                 }
             }
             catch (Exception ex)
@@ -121,6 +125,40 @@ namespace CardsGUIClient
                 MessageBox.Show(ex.Message);
             }
         } // end sliderQuestions_ValueChanged()
+
+
+        private void txtCategories_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        {
+            try
+            {
+                if (game != null)
+                {
+                    game.Category = sender.ToString();
+
+                    // update GUI
+                    txtQuestionCount.Text = $"{sliderQuestions.Value} Questions";
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        } // end txtCategories_SelectionChanged()
+
+        private void txtTimePerQuestion_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        {
+            try
+            {
+                if (game != null)
+                {
+                    game.TimePerQuestion = int.Parse(sender.ToString());
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        } // end txtTimePerQuestion_TextChanged()
 
         // Helper methods
 
@@ -195,9 +233,9 @@ namespace CardsGUIClient
         //} // end btnClose_Click()
 
 
-        private delegate void ClientUpdateDelegate(CallbackInfo info);
+        private delegate void ClientUpdateDelegate(CallbackGameRulesInfo info);
 
-        public void UpdateClient(CallbackInfo info)
+        public void UpdateClient(CallbackGameRulesInfo info)
         {
             if (System.Threading.Thread.CurrentThread == this.Dispatcher.Thread)
             {
@@ -218,9 +256,30 @@ namespace CardsGUIClient
             }
         }
 
+        public void UpdateGameRules(CallbackGameRulesInfo info)
+        {
+            if (System.Threading.Thread.CurrentThread == this.Dispatcher.Thread)
+            {
+                sliderQuestions.Value = info.NumQuestions;
+                txtQuestionCount.Text = $"{info.NumQuestions} Questions";
+                txtTimePerQuestion.Text = info.TimePerQuestion.ToString();
+                txtTimer.Text = $"{info.TimePerQuestion}s";
+                txtCategories.Text = info.Category;
+                lstPlayers.ItemsSource = info.Players;
+                btnStart.Visibility = info.GameHost ? Visibility.Visible : Visibility.Hidden;
+                btnReady.Visibility = info.GameHost ? Visibility.Hidden : Visibility.Visible;
+            }
+            else
+            {
+                // Not the dispatcher thread that's calling this method!
+                this.Dispatcher.BeginInvoke(new ClientUpdateDelegate(UpdateGameRules), info);
+            }
+        }
+
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            shoe?.UnregisterFromCallbacks();
+            game?.UnregisterFromCallbacks();
         }
+
     } // end MainWindow class
 }

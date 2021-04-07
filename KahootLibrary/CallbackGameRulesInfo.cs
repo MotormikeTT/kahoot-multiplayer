@@ -22,23 +22,29 @@ using System.Runtime.Serialization; // WCF data contract types
 namespace KahootLibrary
 {
     [DataContract]
-    public class CallbackInfo
+    public class CallbackGameRulesInfo
     {
         [DataMember]
-        public List<Question> Questions { get; private set; }
+        public List<Player> Players { get; private set; }
+        [DataMember]
+        public string Category { get; private set; }
         [DataMember]
         public int NumQuestions { get; private set; }
         [DataMember]
         public int TimePerQuestion { get; private set; }
         [DataMember]
         public bool Ready { get; private set; }
+        [DataMember]
+        public bool GameHost { get; private set; }
 
-        public CallbackInfo(List<Question> q, int n, int t, bool r)
+        public CallbackGameRulesInfo(List<Player> ps, string c, int n, int t, bool r, bool gh)
         {
-            Questions = q;
+            Players = ps;
+            Category = c;
             NumQuestions = n;
             TimePerQuestion = t;
             Ready = r;
+            GameHost = gh;
         }
     }
 }
