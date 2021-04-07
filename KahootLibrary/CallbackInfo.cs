@@ -19,23 +19,26 @@ using System.Threading.Tasks;
 
 using System.Runtime.Serialization; // WCF data contract types
 
-namespace CardsLibrary
+namespace KahootLibrary
 {
     [DataContract]
     public class CallbackInfo
     {
         [DataMember]
-        public int NumCards { get; private set; }
-        [DataMember] 
-        public int NumDecks { get; private set; }
-        [DataMember] 
-        public bool EmptyTheHand { get; private set; }
+        public List<Question> Questions { get; private set; }
+        [DataMember]
+        public int NumQuestions { get; private set; }
+        [DataMember]
+        public int TimePerQuestion { get; private set; }
+        [DataMember]
+        public bool Ready { get; private set; }
 
-        public CallbackInfo(int c, int d, bool e)
+        public CallbackInfo(List<Question> q, int n, int t, bool r)
         {
-            NumCards = c;
-            NumDecks = d;
-            EmptyTheHand = e;
+            Questions = q;
+            NumQuestions = n;
+            TimePerQuestion = t;
+            Ready = r;
         }
     }
 }

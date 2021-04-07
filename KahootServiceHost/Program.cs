@@ -16,9 +16,9 @@
 
 using System;
 using System.ServiceModel;  // WCF types
-using CardsLibrary; // Shoe and IShoe types
+using KahootLibrary; // Shoe and IShoe types
 
-namespace CardsServiceHost
+namespace KahootServiceHost
 {
     class Program
     {
@@ -34,7 +34,7 @@ namespace CardsServiceHost
                 // Register the service Contract and Binding
                 //servHost.AddServiceEndpoint(typeof(IShoe), new NetTcpBinding(), "ShoeService");
 
-                servHost = new ServiceHost(typeof(Shoe));
+                servHost = new ServiceHost(typeof(Game));
 
 
                 // Run the service

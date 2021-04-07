@@ -22,36 +22,33 @@
 using System;
 using System.Runtime.Serialization; // WCF data contract types
 
-namespace CardsLibrary
+namespace KahootLibrary
 {
     /*--------------------- Public type definitions --------------------*/
 
-    public enum SuitID { Clubs, Diamonds, Hearts, Spades };
-    public enum RankID { Ace, King, Queen, Jack, Ten, Nine, Eight, Seven, Six, Five, Four, Three, Two };
 
 
     // The class definition is now invisible from outside the CardsLibrary assembly
     [DataContract]
-    public class Card 
+    public class Player
     {
         /*-------------------------- Constructors --------------------------*/
 
-        internal Card(SuitID s, RankID r)
+        internal Player(string n)
         {
-            Suit = s;
-            Rank = r;
+            Name = n;
         }
 
         /*------------------ Public properties and methods -----------------*/
 
         [DataMember]
-        public SuitID Suit { get; private set; }
+        public string Name { get; private set; }
         [DataMember]
-        public RankID Rank { get; private set; }
+        public int[] Points { get; private set; }
 
         public override string ToString()
         {
-            return Rank.ToString() + " of " + Suit.ToString();
+            return $"Player {Name} has {Points} points";
         }
 
     } // end Card class
