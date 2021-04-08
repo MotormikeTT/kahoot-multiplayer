@@ -125,7 +125,6 @@ namespace KahootLibrary
             {
                 players[playerIndex].CalculatePoints(time);
                 players = players.OrderBy(x => x.TotalPoints).ToList();
-                updateGameRules(true);
                 return true;
             }
             else

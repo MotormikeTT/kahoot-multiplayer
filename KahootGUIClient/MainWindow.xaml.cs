@@ -216,6 +216,8 @@ namespace CardsGUIClient
                 if (!info.EndGame)
                 {
                     DisableAnswerButtons(false);
+                    lstPlayers.ItemsSource = null;
+                    lstPlayers.ItemsSource = info.Players;
                     time = TimeSpan.FromSeconds(game.TimePerQuestion);
 
                     timer = new DispatcherTimer(new TimeSpan(0, 0, 1), DispatcherPriority.Normal, delegate
