@@ -39,9 +39,11 @@ namespace KahootLibrary
         [OperationContract(IsOneWay = true)]
         void StartGame();
         [OperationContract]
-        Question GetQuestion();
+        void GetNextQuestion();
         [OperationContract]
-        bool RegisterPlayer(string playerName);
+        bool CheckAnswer(string answer, int currentPlayerIdx, int time);
+        [OperationContract]
+        int RegisterPlayer(string playerName);
         int NumQuestions { [OperationContract] get; [OperationContract(IsOneWay = true)] set; }
         string Category { [OperationContract] get; [OperationContract(IsOneWay = true)] set; }
         List<string> Categories { [OperationContract] get; }
@@ -102,38 +104,53 @@ namespace KahootLibrary
             questionIdx = 0;
 
             updateGameRules(true);
+            updateInGameInfo(false);
         }
 
         // Returns a copy of the next Card in the cards collection
-        public Question GetQuestion()
+        public void GetNextQuestion()
         {
-            if (questionIdx >= questions.Count)
-                throw new ArgumentException("No more questions.");
+            bool endGame = false;
+            if (questionIdx >= questions.Count - 1)
+                endGame = true;
+            else
+                questionIdx++;
 
-            Question question = questions[questionIdx++];
-
-            updateGameRules(false);
-
-            return question;
+            updateInGameInfo(endGame);
         }
-        
+
+        public bool CheckAnswer(string answer, int playerIndex, int time)
+        {
+            if (questions[questionIdx].Answer.Equals(answer))
+            {
+                players[playerIndex].CalculatePoints(time);
+                players = players.OrderBy(x => x.TotalPoints).ToList();
+                updateGameRules(true);
+                return true;
+            }
+            else
+                return false;
+        }
+
         /// <summary>
         /// register newely added player
         /// </summary>
         /// <param name="playerName"></param>
         /// <param name="startGame"></param>
         /// <returns>registered</returns>
-        public bool RegisterPlayer(string playerName)
+        public int RegisterPlayer(string playerName)
         {
+            if (string.IsNullOrEmpty(playerName))
+                return -1;
             Player player = new Player(playerName);
             if (!players.Contains(player))
             {
                 players.Add(player);
                 updateGameRules(false);
-                return true;
+                return players.Count - 1;
             }
 
-            return false;
+            return -1;
         }
 
         // Lets the client read or modify the number of decks in the shoe
@@ -226,15 +243,14 @@ namespace KahootLibrary
         // Populates the cards attribute with Card objects
         private void populateQuestions()
         {
-            string[] questions = File.ReadAllText(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), $@".\categories\{category}.txt")).Split(new string[] { "#Q " }, StringSplitOptions.None);
-            List<Question> listOfQuestions = new List<Question>();
-            foreach (string question in questions)
+            string[] questionsArray = File.ReadAllText(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), $@".\categories\{category}.txt")).Split(new string[] { "#Q " }, StringSplitOptions.None);
+            foreach (string question in questionsArray)
             {
-                string[] questionSplit = question.Trim().Split('\n');
+                string[] questionSplit = question.Replace("\r\n\r\n", "\r\n").Trim().Split('\n');
                 if (questionSplit.Length == 6)
                 {
-                    Question newQuestion = new Question(questionSplit[0], questionSplit[1].Remove(0, 2), questionSplit.Skip(2).ToArray());
-                    listOfQuestions.Add(newQuestion);
+                    Question newQuestion = new Question(questionSplit[0], questionSplit[1].Remove(0, 2), questionSplit.Skip(2).Select(x => x.Remove(0,2)).ToArray());
+                    questions.Add(newQuestion);
                 }
             }
         }
@@ -253,6 +269,18 @@ namespace KahootLibrary
                 cb.UpdateGameRules(info);
         }
 
+        // Uses the client callback objects to send current Shoe information 
+        // to clients. If the change in teh Shoe state was triggered by a method call 
+        // from a specific client, then that particular client will be excluded from
+        // the update since it will already be updated directly by the call.
+        private void updateInGameInfo(bool endGame)
+        {
+            // Prepare the CallbackInfo parameter
+            CallbackInGameInfo info = new CallbackInGameInfo(players, questions[questionIdx], endGame);
 
+            // Update all clients
+            foreach (ICallback cb in callbacks)
+                cb.UpdateInGame(info);
+        }
     } // end Shoe class
 }

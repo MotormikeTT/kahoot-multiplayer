@@ -14,9 +14,26 @@
  * Modificatons:    
  */
 
+using System.Collections.Generic;
+using System.Runtime.Serialization;
+
 namespace KahootLibrary
 {
+    [DataContract]
     public class CallbackInGameInfo
     {
+        [DataMember]
+        public List<Player> Players { get; private set; }
+        [DataMember]
+        public Question Question { get; private set; }
+        [DataMember]
+        public bool EndGame { get; private set; }
+
+        public CallbackInGameInfo(List<Player> ps, Question q, bool e)
+        {
+            Players = ps;
+            Question = q;
+            EndGame = e;
+        }
     }
 }

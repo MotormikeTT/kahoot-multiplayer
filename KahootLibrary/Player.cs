@@ -57,9 +57,14 @@ namespace KahootLibrary
             }
         }
 
+        public void CalculatePoints(int time)
+        {
+            points?.Add(50 * time);
+        }
+
         public override string ToString()
         {
-            return $"{name},             {TotalPoints} points";
+            return $"{name}\t\t\t{TotalPoints} points";
         }
 
         public override bool Equals(object obj)

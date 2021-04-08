@@ -24,17 +24,22 @@ using System;
 using System.Windows;
 using System.ServiceModel;  // WCF  types
 using KahootLibrary;
+using System.Windows.Threading;
+using System.Windows.Controls;
 
 namespace CardsGUIClient
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    [CallbackBehavior(ConcurrencyMode=ConcurrencyMode.Reentrant, UseSynchronizationContext=false)]
-    public partial class MainWindow : Window, ICallback 
+    [CallbackBehavior(ConcurrencyMode = ConcurrencyMode.Reentrant, UseSynchronizationContext = false)]
+    public partial class MainWindow : Window, ICallback
     {
         // Private member variables
         private IGame game = null;
+        private int clientIdx;
+        private DispatcherTimer timer;
+        private TimeSpan time;
 
         // C'tor
         public MainWindow()
@@ -75,12 +80,12 @@ namespace CardsGUIClient
             try
             {
                 ///RUN SOMETHING
-                bool registered = game.RegisterPlayer(txtPlayerName.Text);
+                clientIdx = game.RegisterPlayer(txtPlayerName.Text);
 
-                if (!registered)
+                if (clientIdx == -1)
                 {
                     txtPlayerName.Text = "";
-                    MessageBox.Show("Name is already taken. please use a different one", null, MessageBoxButton.OK);
+                    MessageBox.Show("Name is already taken or empty. please use a different one", null, MessageBoxButton.OK);
                 }
                 else
                     btnReady.IsEnabled = false;
@@ -96,20 +101,21 @@ namespace CardsGUIClient
             try
             {
                 ///RUN SOMETHING
-                bool registered = game.RegisterPlayer(txtPlayerName.Text);
+                clientIdx = game.RegisterPlayer(txtPlayerName.Text);
 
-                if (!registered)
+                if (clientIdx == -1)
                 {
                     txtPlayerName.Text = "";
-                    MessageBox.Show("Name is already taken. please use a different one", null, MessageBoxButton.OK);
+                    MessageBox.Show("Name is already taken or empty. please use a different one", null, MessageBoxButton.OK);
                 }
                 else
                 {
                     btnStart.IsEnabled = false;
                     game.StartGame();
 
-                    // UPDATE GUI
                     
+                    // UPDATE GUI
+
                 }
             }
             catch (Exception ex)
@@ -123,8 +129,12 @@ namespace CardsGUIClient
             try
             {
                 ///RUN SOMETHING
-
+                if (game.CheckAnswer((e.Source as Button).Content.ToString(), clientIdx, (int)time.TotalSeconds))
+                    MessageBox.Show("Correct", null, MessageBoxButton.OK);
+                else
+                    MessageBox.Show("Wrong", null, MessageBoxButton.OK);
                 // Update the GUI
+                DisableAnswerButtons(true);
             }
             catch (Exception ex)
             {
@@ -196,6 +206,32 @@ namespace CardsGUIClient
                 //    lstCards.Items.Clear();
                 //    txtHandCount.Text = "0";
                 //}
+                labelGameStatus.Text = $"Game started with category: {game.Category.Replace("-", " ")}";
+                labelCurrentQuestion.Text = info.Question.Sentence;
+                buttonAnswerA.Content = info.Question.Options[0];
+                buttonAnswerB.Content = info.Question.Options[1];
+                buttonAnswerC.Content = info.Question.Options[2];
+                buttonAnswerD.Content = info.Question.Options[3];
+
+                if (!info.EndGame)
+                {
+                    DisableAnswerButtons(false);
+                    time = TimeSpan.FromSeconds(game.TimePerQuestion);
+
+                    timer = new DispatcherTimer(new TimeSpan(0, 0, 1), DispatcherPriority.Normal, delegate
+                    {
+                        txtTimer.Text = $"{time.ToString("ss")} s";
+                        if (time == TimeSpan.Zero)
+                        {
+                            timer.Stop();
+                            game.GetNextQuestion();
+                        }
+                        time = time.Add(TimeSpan.FromSeconds(-1));
+                    }, Application.Current.Dispatcher);
+
+                    timer.Start();
+                }
+
             }
             else
             {
@@ -213,13 +249,19 @@ namespace CardsGUIClient
                 sliderQuestions.Value = info.NumQuestions;
                 txtQuestionCount.Text = $"{info.NumQuestions} Questions";
                 txtTimePerQuestion.Text = info.TimePerQuestion.ToString();
-                txtTimer.Text = $"{info.TimePerQuestion}s";
-                comboCategories.Text = info.Category;
+                txtTimer.Text = $"{info.TimePerQuestion} s";
+                if (!info.GameHost)
+                    comboCategories.Text = info.Category?.Replace("-", " ");
                 lstPlayers.ItemsSource = info.Players;
+                DisableAnswerButtons(true);
                 if (info.GameHost)
                 {
                     btnStart.Visibility = Visibility.Visible;
                     btnReady.Visibility = Visibility.Hidden;
+                    if (string.IsNullOrEmpty(info.Category))
+                        btnStart.IsEnabled = false;
+                    else
+                        btnStart.IsEnabled = true;
                     sliderQuestions.IsEnabled = true;
                     txtQuestionCount.IsEnabled = true;
                     txtTimePerQuestion.IsEnabled = true;
@@ -230,6 +272,7 @@ namespace CardsGUIClient
                 {
                     //btnStart.Visibility = Visibility.Visible;
                     //btnReady.Visibility = Visibility.Hidden;
+                    DisableAnswerButtons(false);
                 }
             }
             else
@@ -242,6 +285,16 @@ namespace CardsGUIClient
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             game?.UnregisterFromCallbacks();
+        }
+
+        // Helper methods
+        private void DisableAnswerButtons(bool disable)
+        {
+            buttonAnswerA.IsEnabled = !disable;
+            buttonAnswerB.IsEnabled = !disable;
+            buttonAnswerC.IsEnabled = !disable;
+            buttonAnswerD.IsEnabled = !disable;
+
         }
     } // end MainWindow class
 }

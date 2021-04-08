@@ -18,10 +18,10 @@
                 <TranslateTransform/>
             </TransformGroup>
         </Grid.RenderTransform>
-        <Label x:Name="labelGameStatus" Content="Waiting for everyone..." HorizontalContentAlignment="Center" Height="26" Margin="90,6,91,0" VerticalAlignment="Top"/>
+        <TextBlock x:Name="labelGameStatus" Text="Waiting for everyone..." Height="26" Margin="47,6,45,0" TextAlignment="Center" VerticalAlignment="Top" TextWrapping="Wrap" Width="295"/>
         <Label Content="Time Left:" HorizontalAlignment="Center"  Height="24" Margin="243,118,79,349" VerticalAlignment="Center" Width="65"/>
         <TextBox x:Name="txtTimer" HorizontalAlignment="Center" Height="20" Margin="313,122,18,349" TextWrapping="Wrap" Text="15s" VerticalAlignment="Center" Width="56"/>
-        <Label x:Name="labelCurrentQuestion" Content="Question?" HorizontalContentAlignment="Center" HorizontalAlignment="Center" Height="26" Margin="90,160,91,0" VerticalAlignment="Top" Width="206"/>
+        <TextBlock x:Name="labelCurrentQuestion" Text="Question?" TextAlignment="Center" HorizontalAlignment="Center" Height="93" Margin="47,160,45,0" VerticalAlignment="Top" TextWrapping="Wrap" Width="295"/>
         <GroupBox Height="318" Margin="21,147,18,0" VerticalAlignment="Top">
             <Grid Margin="0,119,3,-2">
                 <Grid.RowDefinitions>
