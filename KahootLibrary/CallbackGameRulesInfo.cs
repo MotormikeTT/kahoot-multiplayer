@@ -33,17 +33,17 @@ namespace KahootLibrary
         [DataMember]
         public int TimePerQuestion { get; private set; }
         [DataMember]
-        public bool Ready { get; private set; }
+        public bool GameStarted { get; private set; }
         [DataMember]
         public bool GameHost { get; private set; }
 
-        public CallbackGameRulesInfo(List<Player> ps, string c, int n, int t, bool r, bool gh)
+        public CallbackGameRulesInfo(List<Player> ps, string c, int n, int t, bool gt, bool gh)
         {
             Players = ps;
             Category = c;
             NumQuestions = n;
             TimePerQuestion = t;
-            Ready = r;
+            GameStarted = gt;
             GameHost = gh;
         }
     }

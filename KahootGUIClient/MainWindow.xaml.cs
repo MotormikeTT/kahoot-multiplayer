@@ -60,9 +60,14 @@ namespace CardsGUIClient
             sliderQuestions.Maximum = 20;
             sliderQuestions.Value = game.NumQuestions;
             comboCategories.ItemsSource = game.Categories;
-            btnStart.Visibility = Visibility.Hidden;
-            //updateCardCounts(false);
 
+            // by default
+            btnStart.Visibility = Visibility.Hidden;
+            sliderQuestions.IsEnabled = false;
+            txtQuestionCount.IsEnabled = false;
+            txtTimePerQuestion.IsEnabled = false;
+            txtTimer.IsEnabled = false;
+            comboCategories.IsEnabled = false;
         } // end default C'tor
 
         private void btnReady_Click(object sender, RoutedEventArgs e)
@@ -70,9 +75,15 @@ namespace CardsGUIClient
             try
             {
                 ///RUN SOMETHING
-                game.RegisterPlayer(txtPlayerName.Text);
+                bool registered = game.RegisterPlayer(txtPlayerName.Text);
 
-                // add to list of players
+                if (!registered)
+                {
+                    txtPlayerName.Text = "";
+                    MessageBox.Show("Name is already taken. please use a different one", null, MessageBoxButton.OK);
+                }
+                else
+                    btnReady.IsEnabled = false;
             }
             catch (Exception ex)
             {
@@ -85,9 +96,21 @@ namespace CardsGUIClient
             try
             {
                 ///RUN SOMETHING
-                game.RegisterPlayer(txtPlayerName.Text);
+                bool registered = game.RegisterPlayer(txtPlayerName.Text);
 
-                // Update the GUI
+                if (!registered)
+                {
+                    txtPlayerName.Text = "";
+                    MessageBox.Show("Name is already taken. please use a different one", null, MessageBoxButton.OK);
+                }
+                else
+                {
+                    btnStart.IsEnabled = false;
+                    game.StartGame();
+
+                    // UPDATE GUI
+                    
+                }
             }
             catch (Exception ex)
             {
@@ -134,7 +157,7 @@ namespace CardsGUIClient
             {
                 if (game != null)
                 {
-                    game.Category = sender.ToString();
+                    game.Category = ((System.Windows.Controls.ComboBox)sender).SelectedValue.ToString();
                 }
             }
             catch (Exception ex)
@@ -149,7 +172,7 @@ namespace CardsGUIClient
             {
                 if (game != null)
                 {
-                    game.TimePerQuestion = int.Parse(sender.ToString());
+                    game.TimePerQuestion = int.Parse(((System.Windows.Controls.TextBox)sender).Text);
                 }
             }
             catch (Exception ex)
@@ -158,81 +181,9 @@ namespace CardsGUIClient
             }
         } // end txtTimePerQuestion_TextChanged()
 
-        // Helper methods
+        private delegate void ClientUpdateInGameDelegate(CallbackInGameInfo info);
 
-        //private void updateCardCounts(bool emptyHand)
-        //{
-        //    if (emptyHand)
-        //        // Only "throw out" drawn cards if the Shoe was shuffled 
-        //        // or the number of decks was changed
-        //        lstCards.Items.Clear();
-
-        //    txtHandCount.Text = lstCards.Items.Count.ToString();
-        //    txtShoeCount.Text = shoe.NumCards.ToString();
-        //} // end updateCardCounts()
-
-        //// Event handlers
-
-        //private void btnDraw_Click(object sender, RoutedEventArgs e)
-        //{
-        //    try 
-        //    {
-        //        Card card = shoe.Draw();
-
-        //        // Update the GUI
-        //        lstCards.Items.Insert(0, card);
-        //        updateCardCounts(false);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        MessageBox.Show(ex.Message);
-        //    }
-        //} // end btnDraw_Click()
-
-        //private void btnShuffle_Click(object sender, RoutedEventArgs e)
-        //{
-        //    try
-        //    {
-        //        shoe.Shuffle();
-
-        //        // Update the GUI
-        //        updateCardCounts(true);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        MessageBox.Show(ex.Message);
-        //    }
-        //} // end btnShuffle_Click()
-
-        //private void sliderDecks_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        //{
-        //    try
-        //    {
-        //        if (shoe != null)
-        //        {
-        //            // Reset the number of decks
-        //            shoe.NumDecks = (int)sliderDecks.Value;
-
-        //            // Update the GUI
-        //            updateCardCounts(true);
-        //            int n = shoe.NumDecks;
-        //            txtDeckCount.Text = n + " deck" + (n == 1 ? "" : "s");
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        MessageBox.Show(ex.Message);
-        //    }
-        //} // end sliderDecks_ValueChanged()
-
-        //private void btnClose_Click(object sender, RoutedEventArgs e)
-        //{
-        //    this.Close();
-        //} // end btnClose_Click()
-
-
-
-        public void UpdateClient(CallbackGameRulesInfo info)
+        public void UpdateInGame(CallbackInGameInfo info)
         {
             if (System.Threading.Thread.CurrentThread == this.Dispatcher.Thread)
             {
@@ -249,11 +200,11 @@ namespace CardsGUIClient
             else
             {
                 // Not the dispatcher thread that's calling this method!
-                this.Dispatcher.BeginInvoke(new ClientUpdateDelegate(UpdateClient), info);
+                this.Dispatcher.BeginInvoke(new ClientUpdateInGameDelegate(UpdateInGame), info);
             }
         }
 
-        private delegate void ClientUpdateDelegate(CallbackGameRulesInfo info);
+        private delegate void ClientUpdateGameRulesDelegate(CallbackGameRulesInfo info);
 
         public void UpdateGameRules(CallbackGameRulesInfo info)
         {
@@ -269,12 +220,22 @@ namespace CardsGUIClient
                 {
                     btnStart.Visibility = Visibility.Visible;
                     btnReady.Visibility = Visibility.Hidden;
+                    sliderQuestions.IsEnabled = true;
+                    txtQuestionCount.IsEnabled = true;
+                    txtTimePerQuestion.IsEnabled = true;
+                    txtTimer.IsEnabled = true;
+                    comboCategories.IsEnabled = true;
+                }
+                if (info.GameStarted)
+                {
+                    //btnStart.Visibility = Visibility.Visible;
+                    //btnReady.Visibility = Visibility.Hidden;
                 }
             }
             else
             {
                 // Not the dispatcher thread that's calling this method!
-                this.Dispatcher.BeginInvoke(new ClientUpdateDelegate(UpdateGameRules), info);
+                this.Dispatcher.BeginInvoke(new ClientUpdateGameRulesDelegate(UpdateGameRules), info);
             }
         }
 
@@ -282,6 +243,5 @@ namespace CardsGUIClient
         {
             game?.UnregisterFromCallbacks();
         }
-
     } // end MainWindow class
 }

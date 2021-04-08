@@ -29,19 +29,19 @@ namespace KahootLibrary
         [OperationContract(IsOneWay = true)]
         void UpdateGameRules(CallbackGameRulesInfo info);
         [OperationContract(IsOneWay = true)]
-        void UpdateClient(CallbackGameRulesInfo info);
+        void UpdateInGame(CallbackInGameInfo info);
     }
 
     // Converted IShoe to a WCF service contract
     [ServiceContract(CallbackContract = typeof(ICallback))]
     public interface IGame
     {
-        /*[OperationContract(IsOneWay = true)]
-        void StartGame();*/
+        [OperationContract(IsOneWay = true)]
+        void StartGame();
         [OperationContract]
         Question GetQuestion();
         [OperationContract]
-        void RegisterPlayer(string playerName);
+        bool RegisterPlayer(string playerName);
         int NumQuestions { [OperationContract] get; [OperationContract(IsOneWay = true)] set; }
         string Category { [OperationContract] get; [OperationContract(IsOneWay = true)] set; }
         List<string> Categories { [OperationContract] get; }
@@ -84,13 +84,15 @@ namespace KahootLibrary
             timePerQuestion = 15;
             //category = "brain-teasers";
             // populate with catgories from files
-            categories = new List<string>(Directory.GetFiles(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), $@".\categories\")));
+            string[] categoriesFiles = Directory.GetFiles(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), $@".\categories\"));
+            categoriesFiles = categoriesFiles.Select(file => file.Substring(file.LastIndexOf('\\') + 1).Split('.')[0].Replace("-", " ")).ToArray();
+            categories = new List<string>(categoriesFiles);
         }
 
         /*------------------ Public properties and methods -----------------*/
 
         // Randomizes the sequence of the Cards in the cards collection
-        public void Shuffle()
+        public void StartGame()
         {
             // Randomize the cards collection
             Random rng = new Random();
@@ -99,7 +101,7 @@ namespace KahootLibrary
             // Reset the cards index
             questionIdx = 0;
 
-            updateUpdateGameRules(true);
+            updateGameRules(true);
         }
 
         // Returns a copy of the next Card in the cards collection
@@ -110,18 +112,28 @@ namespace KahootLibrary
 
             Question question = questions[questionIdx++];
 
-            updateUpdateGameRules(false);
+            updateGameRules(false);
 
             return question;
         }
-
-        public void RegisterPlayer(string playerName)
+        
+        /// <summary>
+        /// register newely added player
+        /// </summary>
+        /// <param name="playerName"></param>
+        /// <param name="startGame"></param>
+        /// <returns>registered</returns>
+        public bool RegisterPlayer(string playerName)
         {
             Player player = new Player(playerName);
-            if(!players.Contains(player))
+            if (!players.Contains(player))
+            {
                 players.Add(player);
+                updateGameRules(false);
+                return true;
+            }
 
-            updateUpdateGameRules(false);
+            return false;
         }
 
         // Lets the client read or modify the number of decks in the shoe
@@ -136,7 +148,7 @@ namespace KahootLibrary
                 if (numQuestions != value)
                 {
                     numQuestions = value;
-                    updateUpdateGameRules(false);
+                    updateGameRules(false);
                 }
             }
         }
@@ -150,12 +162,13 @@ namespace KahootLibrary
             }
             set
             {
-                if (category != value)
+                string fileName = value.Replace(" ", "-");
+                if (category != fileName)
                 {
-                    category = value;
+                    category = fileName;
 
-                    populate();
-                    updateUpdateGameRules(false);
+                    populateQuestions();
+                    updateGameRules(false);
                 }
             }
         }
@@ -179,7 +192,7 @@ namespace KahootLibrary
                 if (timePerQuestion != value)
                 {
                     timePerQuestion = value;
-                    updateUpdateGameRules(false);
+                    updateGameRules(false);
                 }
             }
         }
@@ -194,7 +207,7 @@ namespace KahootLibrary
                 callbacks.Add(cb);
 
             gameHost = callbacks.Count == 1;
-            updateUpdateGameRules(false);
+            updateGameRules(false);
         }
 
         public void UnregisterFromCallbacks()
@@ -211,7 +224,7 @@ namespace KahootLibrary
         /*------------------------- Helper methods -------------------------*/
 
         // Populates the cards attribute with Card objects
-        private void populate()
+        private void populateQuestions()
         {
             string[] questions = File.ReadAllText(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), $@".\categories\{category}.txt")).Split(new string[] { "#Q " }, StringSplitOptions.None);
             List<Question> listOfQuestions = new List<Question>();
@@ -230,10 +243,10 @@ namespace KahootLibrary
         // to clients. If the change in teh Shoe state was triggered by a method call 
         // from a specific client, then that particular client will be excluded from
         // the update since it will already be updated directly by the call.
-        private void updateUpdateGameRules(bool ready)
+        private void updateGameRules(bool startGame)
         {
             // Prepare the CallbackInfo parameter
-            CallbackGameRulesInfo info = new CallbackGameRulesInfo(players, category, numQuestions, timePerQuestion, ready, gameHost);
+            CallbackGameRulesInfo info = new CallbackGameRulesInfo(players, category, numQuestions, timePerQuestion, startGame, gameHost);
 
             // Update all clients
             foreach (ICallback cb in callbacks)

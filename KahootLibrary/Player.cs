@@ -19,7 +19,8 @@
  *                  assembly System.Runtime.Serialization.dll.
  */
 
-using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.Serialization; // WCF data contract types
 
 namespace KahootLibrary
@@ -32,23 +33,38 @@ namespace KahootLibrary
     [DataContract]
     public class Player
     {
+        [DataMember]
+        private string name;
+        private List<int> points = new List<int>();
+
         /*-------------------------- Constructors --------------------------*/
 
         internal Player(string n)
         {
-            Name = n;
+            name = n;
         }
 
         /*------------------ Public properties and methods -----------------*/
 
         [DataMember]
-        public string Name { get; private set; }
-        [DataMember]
-        public int[] Points { get; private set; }
+        public int TotalPoints {
+            get {
+                if (points == null || points.Count == 0) return 0;
+                return points.Aggregate((total, point) => total += point);
+            }
+            set {
+                points?.Add(value);
+            }
+        }
 
         public override string ToString()
         {
-            return $"Player {Name}\t {Points} points";
+            return $"{name},             {TotalPoints} points";
+        }
+
+        public override bool Equals(object obj)
+        {
+            return ((Player)obj).name == name;
         }
 
     } // end Card class

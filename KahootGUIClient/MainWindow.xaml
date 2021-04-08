@@ -57,7 +57,7 @@
         <Slider x:Name="sliderQuestions" IsSnapToTickEnabled="True" Grid.Column="1" HorizontalAlignment="Center" Margin="50,102,60,0" VerticalAlignment="Top" Width="186" Minimum="1" SmallChange="1" TickPlacement="BottomRight" ValueChanged="sliderQuestions_ValueChanged" Height="24"/>
         <TextBox x:Name="txtQuestionCount" Grid.Column="1" HorizontalAlignment="Center" Height="23" Margin="99,126,115,0" TextWrapping="Wrap" Text="1 Question" VerticalAlignment="Top" Width="82" BorderThickness="0" HorizontalContentAlignment="Center"/>
         <Label Content="Enter player name: " HorizontalAlignment="Center" Height="26" Margin="40,160,156,305" VerticalAlignment="Center" Width="111" Grid.Column="1" />
-        <TextBox x:Name="txtPlayerName" Grid.Column="1" HorizontalAlignment="Center" Height="19" Margin="156,164,56,308" TextWrapping="Wrap" VerticalAlignment="Center" Width="95" RenderTransformOrigin="0.5,0.5" />
+        <TextBox x:Name="txtPlayerName" Grid.Column="1" HorizontalAlignment="Center" Height="23" Margin="156,163,56,305" TextWrapping="Wrap" VerticalAlignment="Center" Width="95" RenderTransformOrigin="0.5,0.5" />
 
         <ListBox x:Name="lstPlayers" Grid.Column="1" HorizontalAlignment="Center" Height="196" Margin="45,191,56,0" VerticalAlignment="Top" Width="206"/>
         <Button x:Name="btnReady" Content="Ready" Grid.Column="1" HorizontalAlignment="Center" Height="32" Margin="55,396,66,0" VerticalAlignment="Top" Width="186" Click="btnReady_Click"/>
