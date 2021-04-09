@@ -1,23 +1,9 @@
 ﻿/*
- * Program:         CardsGuiClient.exe
+ * Program:         KahootGuiClient.exe
  * Module:          MainWindow.xaml.cs
- * Author:          T. Haworth
- * Date:            March 9, 2021
- * Description:     A Windows WPF client that uses CardsLibrary.dll via a WCF service.
- * 
- *                  Note that we had to add a reference to the .NET Framework 
- *                  assembly System.ServiceModel.dll.
- *                  
- * Modifications:   Mar 16, 2021
- *                  The client now receives a Card object from the Shoe's Draw() method 
- *                  now returns a  instead of a string because Card is now a data 
- *                  contract. Now uses an administrative endpoint which is configured
- *                  in the project's App.config file.
- *                  
- *                  Mar 23, 2021
- *                  Implements the ICallback contract and registers (and unregisters) for 
- *                  the callbacks service so that the client will reflect real time updates 
- *                  about the state of the Shoe.
+ * Author:          George Moussa, Michael Mac Lean
+ * Date:            April 4, 2021
+ * Description:     A Windows WPF client that uses KahootLibrary.dll via a WCF service.
  */
 
 using System;
@@ -26,6 +12,8 @@ using System.ServiceModel;  // WCF  types
 using KahootLibrary;
 using System.Windows.Threading;
 using System.Windows.Controls;
+using System.Windows.Data;
+using System.ComponentModel;
 
 namespace CardsGUIClient
 {
@@ -46,16 +34,9 @@ namespace CardsGUIClient
         {
             InitializeComponent();
 
-            // Note that the client no longer creates a Shoe object locally!
-
             // Connect to the WCF service endpoint 
             DuplexChannelFactory<IGame> channel = new DuplexChannelFactory<IGame>(this, "KahootEndPoint");
             game = channel.CreateChannel();
-
-            // The variable "shoe" above does NOT reference a Shoe object 
-            // directly. Instead it references a local "transparent proxy" object which 
-            // implements the IShoe interface for the purpose of communicating
-            // all client requests to the service host application
 
             // Register for the callback service
             game.RegisterForCallbacks();
@@ -88,7 +69,10 @@ namespace CardsGUIClient
                     MessageBox.Show("Name is already taken or empty. please use a different one", null, MessageBoxButton.OK);
                 }
                 else
+                {
                     btnReady.IsEnabled = false;
+                    txtPlayerName.IsEnabled = false;
+                }
             }
             catch (Exception ex)
             {
@@ -110,12 +94,7 @@ namespace CardsGUIClient
                 }
                 else
                 {
-                    btnStart.IsEnabled = false;
                     game.StartGame();
-
-                    
-                    // UPDATE GUI
-
                 }
             }
             catch (Exception ex)
@@ -130,11 +109,11 @@ namespace CardsGUIClient
             {
                 ///RUN SOMETHING
                 if (game.CheckAnswer((e.Source as Button).Content.ToString(), clientIdx, (int)time.TotalSeconds))
-                    MessageBox.Show("Correct", null, MessageBoxButton.OK);
+                    labelResult.Text = "Correct Answer";
                 else
-                    MessageBox.Show("Wrong", null, MessageBoxButton.OK);
+                    labelResult.Text = "Wrong Answer";
                 // Update the GUI
-                DisableAnswerButtons(true);
+                disableAnswerButtons(true);
             }
             catch (Exception ex)
             {
@@ -161,13 +140,13 @@ namespace CardsGUIClient
         } // end sliderQuestions_ValueChanged()
 
 
-        private void comboCategories_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        private void comboCategories_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             try
             {
                 if (game != null)
                 {
-                    game.Category = ((System.Windows.Controls.ComboBox)sender).SelectedValue.ToString();
+                    game.Category = (sender as ComboBox).SelectedValue.ToString();
                 }
             }
             catch (Exception ex)
@@ -176,13 +155,13 @@ namespace CardsGUIClient
             }
         } // end txtCategories_SelectionChanged()
 
-        private void txtTimePerQuestion_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        private void txtTimePerQuestion_TextChanged(object sender, TextChangedEventArgs e)
         {
             try
             {
                 if (game != null)
                 {
-                    game.TimePerQuestion = int.Parse(((System.Windows.Controls.TextBox)sender).Text);
+                    game.TimePerQuestion = int.Parse((sender as TextBox).Text);
                 }
             }
             catch (Exception ex)
@@ -191,21 +170,37 @@ namespace CardsGUIClient
             }
         } // end txtTimePerQuestion_TextChanged()
 
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            game?.UnregisterFromCallbacks();
+        }
+
+        // Helper method
+        private void disableAnswerButtons(bool disable)
+        {
+            buttonAnswerA.IsEnabled = !disable;
+            buttonAnswerB.IsEnabled = !disable;
+            buttonAnswerC.IsEnabled = !disable;
+            buttonAnswerD.IsEnabled = !disable;
+        }
+
+        /// ICallback implementaion
+
         private delegate void ClientUpdateInGameDelegate(CallbackInGameInfo info);
 
         public void UpdateInGame(CallbackInGameInfo info)
         {
             if (System.Threading.Thread.CurrentThread == this.Dispatcher.Thread)
             {
-                // Update the GUI
-                //txtShoeCount.Text = info.NumCards.ToString();
-                //sliderDecks.Value = info.NumDecks;
-                //txtDeckCount.Text = info.NumDecks + " deck" + (info.NumDecks == 1 ? "" : "s");
-                //if (info.EmptyTheHand)
-                //{
-                //    lstCards.Items.Clear();
-                //    txtHandCount.Text = "0";
-                //}
+                // disable rule controls
+                btnStart.IsEnabled = false;
+                txtPlayerName.IsEnabled = false;
+                sliderQuestions.IsEnabled = false;
+                txtQuestionCount.IsEnabled = false;
+                txtTimePerQuestion.IsEnabled = false;
+                txtTimer.IsEnabled = false;
+                comboCategories.IsEnabled = false;
+
                 labelGameStatus.Text = $"Game started with category: {game.Category.Replace("-", " ")}";
                 labelCurrentQuestion.Text = info.Question.Sentence;
                 buttonAnswerA.Content = info.Question.Options[0];
@@ -215,25 +210,35 @@ namespace CardsGUIClient
 
                 if (!info.EndGame)
                 {
-                    DisableAnswerButtons(false);
-                    lstPlayers.ItemsSource = null;
+                    labelResult.Text = "Choose your answer...";
+                    disableAnswerButtons(false);
+                    // get players and sort by points
                     lstPlayers.ItemsSource = info.Players;
+                    CollectionView view = (CollectionView)CollectionViewSource.GetDefaultView(lstPlayers.ItemsSource);
+                    view.SortDescriptions.Add(new SortDescription("TotalPoints", ListSortDirection.Descending));
+                    view.Refresh();
+
                     time = TimeSpan.FromSeconds(game.TimePerQuestion);
-
-                    timer = new DispatcherTimer(new TimeSpan(0, 0, 1), DispatcherPriority.Normal, delegate
+                    if (timer == null)
                     {
-                        txtTimer.Text = $"{time.ToString("ss")} s";
-                        if (time == TimeSpan.Zero)
+                        timer = new DispatcherTimer(new TimeSpan(0, 0, 1), DispatcherPriority.Normal, delegate
                         {
-                            timer.Stop();
-                            game.GetNextQuestion();
-                        }
-                        time = time.Add(TimeSpan.FromSeconds(-1));
-                    }, Application.Current.Dispatcher);
-
+                            txtTimer.Text = $"{time.ToString("ss")} s";
+                            if (time == TimeSpan.Zero)
+                            {
+                                timer.Stop();
+                                game.GetNextQuestion();
+                            }
+                            time = time.Add(TimeSpan.FromSeconds(-1));
+                        }, Application.Current.Dispatcher);
+                    }
                     timer.Start();
                 }
-
+                else
+                {
+                    labelGameStatus.Text = "Game over.... Check player list for scores!";
+                    labelResult.Text = "Game over.... Check player list for scores!";
+                }
             }
             else
             {
@@ -252,29 +257,20 @@ namespace CardsGUIClient
                 txtQuestionCount.Text = $"{info.NumQuestions} Questions";
                 txtTimePerQuestion.Text = info.TimePerQuestion.ToString();
                 txtTimer.Text = $"{info.TimePerQuestion} s";
-                if (!info.GameHost)
-                    comboCategories.Text = info.Category?.Replace("-", " ");
+                comboCategories.Text = info.Category?.Replace("-", " ");
                 lstPlayers.ItemsSource = info.Players;
-                DisableAnswerButtons(true);
+                disableAnswerButtons(true);
                 if (info.GameHost)
                 {
+                    labelGameStatus.Text = "You're the game host! Start game when eveyrone joins";
                     btnStart.Visibility = Visibility.Visible;
                     btnReady.Visibility = Visibility.Hidden;
-                    if (string.IsNullOrEmpty(info.Category))
-                        btnStart.IsEnabled = false;
-                    else
-                        btnStart.IsEnabled = true;
+                    btnStart.IsEnabled = true;
                     sliderQuestions.IsEnabled = true;
                     txtQuestionCount.IsEnabled = true;
                     txtTimePerQuestion.IsEnabled = true;
                     txtTimer.IsEnabled = true;
                     comboCategories.IsEnabled = true;
-                }
-                if (info.GameStarted)
-                {
-                    //btnStart.Visibility = Visibility.Visible;
-                    //btnReady.Visibility = Visibility.Hidden;
-                    DisableAnswerButtons(false);
                 }
             }
             else
@@ -282,21 +278,6 @@ namespace CardsGUIClient
                 // Not the dispatcher thread that's calling this method!
                 this.Dispatcher.BeginInvoke(new ClientUpdateGameRulesDelegate(UpdateGameRules), info);
             }
-        }
-
-        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
-        {
-            game?.UnregisterFromCallbacks();
-        }
-
-        // Helper methods
-        private void DisableAnswerButtons(bool disable)
-        {
-            buttonAnswerA.IsEnabled = !disable;
-            buttonAnswerB.IsEnabled = !disable;
-            buttonAnswerC.IsEnabled = !disable;
-            buttonAnswerD.IsEnabled = !disable;
-
         }
     } // end MainWindow class
 }

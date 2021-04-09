@@ -84,11 +84,12 @@ namespace KahootLibrary
             players = new List<Player>();
             numQuestions = 5;
             timePerQuestion = 15;
-            //category = "brain-teasers";
             // populate with catgories from files
             string[] categoriesFiles = Directory.GetFiles(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), $@".\categories\"));
             categoriesFiles = categoriesFiles.Select(file => file.Substring(file.LastIndexOf('\\') + 1).Split('.')[0].Replace("-", " ")).ToArray();
             categories = new List<string>(categoriesFiles);
+            category = Categories.FirstOrDefault();
+            populateQuestions();
         }
 
         /*------------------ Public properties and methods -----------------*/
@@ -103,7 +104,6 @@ namespace KahootLibrary
             // Reset the cards index
             questionIdx = 0;
 
-            updateGameRules(true);
             updateInGameInfo(false);
         }
 
@@ -136,7 +136,7 @@ namespace KahootLibrary
         /// </summary>
         /// <param name="playerName"></param>
         /// <param name="startGame"></param>
-        /// <returns>registered</returns>
+        /// <returns>player index</returns>
         public int RegisterPlayer(string playerName)
         {
             if (string.IsNullOrEmpty(playerName))
@@ -145,7 +145,7 @@ namespace KahootLibrary
             if (!players.Contains(player))
             {
                 players.Add(player);
-                updateGameRules(false);
+                updateGameRules();
                 return players.Count - 1;
             }
 
@@ -164,7 +164,7 @@ namespace KahootLibrary
                 if (numQuestions != value)
                 {
                     numQuestions = value;
-                    updateGameRules(false);
+                    updateGameRules();
                 }
             }
         }
@@ -184,7 +184,7 @@ namespace KahootLibrary
                     category = fileName;
 
                     populateQuestions();
-                    updateGameRules(false);
+                    updateGameRules();
                 }
             }
         }
@@ -208,7 +208,7 @@ namespace KahootLibrary
                 if (timePerQuestion != value)
                 {
                     timePerQuestion = value;
-                    updateGameRules(false);
+                    updateGameRules();
                 }
             }
         }
@@ -223,7 +223,7 @@ namespace KahootLibrary
                 callbacks.Add(cb);
 
             gameHost = callbacks.Count == 1;
-            updateGameRules(false);
+            updateGameRules();
         }
 
         public void UnregisterFromCallbacks()
@@ -258,10 +258,10 @@ namespace KahootLibrary
         // to clients. If the change in teh Shoe state was triggered by a method call 
         // from a specific client, then that particular client will be excluded from
         // the update since it will already be updated directly by the call.
-        private void updateGameRules(bool startGame)
+        private void updateGameRules()
         {
             // Prepare the CallbackInfo parameter
-            CallbackGameRulesInfo info = new CallbackGameRulesInfo(players, category, numQuestions, timePerQuestion, startGame, gameHost);
+            CallbackGameRulesInfo info = new CallbackGameRulesInfo(players, category, numQuestions, timePerQuestion, gameHost);
 
             // Update all clients
             foreach (ICallback cb in callbacks)

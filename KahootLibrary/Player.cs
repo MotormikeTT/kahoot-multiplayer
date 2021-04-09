@@ -33,43 +33,45 @@ namespace KahootLibrary
     [DataContract]
     public class Player
     {
-        [DataMember]
-        private string name;
         private List<int> points = new List<int>();
 
         /*-------------------------- Constructors --------------------------*/
 
         internal Player(string n)
         {
-            name = n;
+            Name = n;
         }
 
         /*------------------ Public properties and methods -----------------*/
 
         [DataMember]
-        public int TotalPoints {
-            get {
-                if (points == null || points.Count == 0) return 0;
-                return points.Aggregate((total, point) => total += point);
-            }
-            set {
-                points?.Add(value);
-            }
-        }
+        public string Name { get; set; }
+
+        [DataMember]
+        public int TotalPoints { get; set; }
 
         public void CalculatePoints(int time)
         {
             points?.Add(50 * time);
+            TotalPoints = points.Aggregate((total, point) => total += point);
         }
 
         public override string ToString()
         {
-            return $"{name}\t\t\t{TotalPoints} points";
+            return $"{Name} {TotalPoints} points";
+        }
+
+        public bool Equals(Player p)
+        {
+            return p.Name == Name;
         }
 
         public override bool Equals(object obj)
         {
-            return ((Player)obj).name == name;
+            if (!(obj is Player))
+                return false;
+
+            return (obj as Player).Name == Name;
         }
 
     } // end Card class

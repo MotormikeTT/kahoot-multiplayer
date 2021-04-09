@@ -11,11 +11,7 @@
  *                  System.Runtime.Serialization to create a DataContract.
  */
 
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using System.Runtime.Serialization; // WCF data contract types
 
@@ -33,17 +29,14 @@ namespace KahootLibrary
         [DataMember]
         public int TimePerQuestion { get; private set; }
         [DataMember]
-        public bool GameStarted { get; private set; }
-        [DataMember]
         public bool GameHost { get; private set; }
 
-        public CallbackGameRulesInfo(List<Player> ps, string c, int n, int t, bool gt, bool gh)
+        public CallbackGameRulesInfo(List<Player> ps, string c, int n, int t, bool gh)
         {
             Players = ps;
             Category = c;
             NumQuestions = n;
             TimePerQuestion = t;
-            GameStarted = gt;
             GameHost = gh;
         }
     }
