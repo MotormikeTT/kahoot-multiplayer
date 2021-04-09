@@ -23,7 +23,6 @@ namespace KahootServiceHost
             {
                 servHost = new ServiceHost(typeof(Game));
 
-
                 // Run the service
                 servHost.Open();
 
