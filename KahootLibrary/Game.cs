@@ -28,8 +28,8 @@ namespace KahootLibrary
     [ServiceContract(CallbackContract = typeof(ICallback))]
     public interface IGame
     {
-        [OperationContract(IsOneWay = true)]
-        void StartGame();
+        [OperationContract]
+        bool StartGame();
         [OperationContract(IsOneWay = true)]
         void EndGame();
         [OperationContract]
@@ -64,7 +64,6 @@ namespace KahootLibrary
         private int timePerQuestion;
         private string category;
         private List<string> categories;
-        private bool gameHost;
 
         private HashSet<ICallback> callbacks = new HashSet<ICallback>();
 
@@ -89,8 +88,12 @@ namespace KahootLibrary
         /*------------------ Public properties and methods -----------------*/
 
         // Randomizes the sequence of the questions in the questions collection
-        public void StartGame()
+        public bool StartGame()
         {
+            // only start when all players are ready
+            if (players.Count != callbacks.Count)
+                return false;
+
             // Randomize the questions collection
             populateQuestions();
             Random rng = new Random();
@@ -100,10 +103,12 @@ namespace KahootLibrary
             questionIdx = 0;
 
             updateInGameInfo(false);
+            return true;
         }
 
         public void EndGame()
         {
+            updateGameRules();
             players.Clear();
         }
 
@@ -123,7 +128,6 @@ namespace KahootLibrary
             if (questions[questionIdx].Answer.Equals(answer))
             {
                 players[playerIndex].CalculatePoints(time);
-                players = players.OrderBy(x => x.TotalPoints).ToList();
                 return true;
             }
             else
@@ -148,7 +152,7 @@ namespace KahootLibrary
                 return players.Count - 1;
             }
 
-            return -1;
+            return players.IndexOf(player);
         }
 
         // Lets the client read or modify the number of questions in the game
@@ -182,7 +186,6 @@ namespace KahootLibrary
                 {
                     category = fileName;
 
-                    populateQuestions();
                     updateGameRules();
                 }
             }
@@ -221,7 +224,6 @@ namespace KahootLibrary
             if (!callbacks.Contains(cb))
                 callbacks.Add(cb);
 
-            gameHost = callbacks.Count == 1;
             updateGameRules();
         }
 
@@ -256,23 +258,29 @@ namespace KahootLibrary
         // Uses the client callback objects to send current Game Rules information to clients.
         private void updateGameRules()
         {
-            // Prepare the CallbackInfo parameter
-            CallbackGameRulesInfo info = new CallbackGameRulesInfo(players, category, numQuestions, timePerQuestion, gameHost);
-
             // Update all clients
             foreach (ICallback cb in callbacks)
+            {
+                // only the game host recieves the game host flag as true
+                bool gameHost = cb == callbacks.ElementAt(0);
+                // Prepare the CallbackInfo parameter
+                CallbackGameRulesInfo info = new CallbackGameRulesInfo(players, category, numQuestions, timePerQuestion, gameHost);
                 cb.UpdateGameRules(info);
+            }
         }
 
         // Uses the client callback objects to send current In Game information to clients.
         private void updateInGameInfo(bool endGame)
         {
-            // Prepare the CallbackInfo parameter
-            CallbackInGameInfo info = new CallbackInGameInfo(players, questions[questionIdx], endGame);
-
             // Update all clients
             foreach (ICallback cb in callbacks)
+            {
+                // only the game host recieves the game host flag as true
+                bool gameHost = cb == callbacks.ElementAt(0);
+                // Prepare the CallbackInfo parameter
+                CallbackInGameInfo info = new CallbackInGameInfo(players, questions[questionIdx], endGame, gameHost);
                 cb.UpdateInGame(info);
+            }
         }
     } // end Shoe class
 }

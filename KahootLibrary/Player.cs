@@ -45,7 +45,7 @@ namespace KahootLibrary
 
         public override string ToString()
         {
-            return $"{Name} {TotalPoints} points";
+            return $"{Name} with {TotalPoints} point total";
         }
 
         public bool Equals(Player p)

@@ -25,12 +25,15 @@ namespace KahootLibrary
         public Question Question { get; private set; }
         [DataMember]
         public bool EndGame { get; private set; }
+        [DataMember]
+        public bool GameHost { get; private set; }
 
-        public CallbackInGameInfo(List<Player> ps, Question q, bool e)
+        public CallbackInGameInfo(List<Player> ps, Question q, bool e, bool gh)
         {
             Players = ps;
             Question = q;
             EndGame = e;
+            GameHost = gh;
         }
     }
 }

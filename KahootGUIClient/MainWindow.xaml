@@ -18,12 +18,12 @@
             </TransformGroup>
         </Grid.RenderTransform>
         <TextBlock x:Name="labelGameStatus" Text="Waiting for everyone..." Height="26" Margin="46,20,48,0" TextAlignment="Center" VerticalAlignment="Top" TextWrapping="Wrap"/>
-        <Label Content="Time Left:" HorizontalAlignment="Right" Margin="0,84,74,0" Width="64" RenderTransformOrigin="0.754,0.5" Height="24" VerticalAlignment="Top"/>
-        <TextBox x:Name="txtTimer" HorizontalAlignment="Right" Height="20" Margin="0,88,18,0" TextWrapping="Wrap" Text="15s" VerticalAlignment="Top" Width="56" IsEnabled="False"/>
-        <TextBlock x:Name="labelCurrentQuestion" Text="Question?" TextAlignment="Center" Height="94" Margin="46,149,48,0" VerticalAlignment="Top" TextWrapping="Wrap"/>
-        <TextBlock x:Name="labelResult" Text="Choose your answer..." TextAlignment="Center" Margin="91,433,86,0" TextWrapping="Wrap" Height="22" VerticalAlignment="Top"/>
-        <GroupBox Height="352" Margin="21,113,18,0" VerticalAlignment="Top">
-            <Grid Margin="0,131,3,27">
+        <Label Content="Time Left:" HorizontalAlignment="Right" Margin="0,70,74,0" Width="64" RenderTransformOrigin="0.754,0.5" Height="24" VerticalAlignment="Top"/>
+        <TextBox x:Name="txtTimer" HorizontalAlignment="Right" Height="20" Margin="0,74,18,0" TextWrapping="Wrap" Text="15s" VerticalAlignment="Top" Width="56" IsEnabled="False"/>
+        <TextBlock x:Name="labelCurrentQuestion" Text="Question?" TextAlignment="Center" Height="112" Margin="46,117,48,0" VerticalAlignment="Top" TextWrapping="Wrap"/>
+        <TextBlock x:Name="labelResult" Text="Choose your answer..." TextAlignment="Center" Margin="91,418,86,0" TextWrapping="Wrap" Height="38" VerticalAlignment="Top"/>
+        <GroupBox Height="366" Margin="21,99,18,0" VerticalAlignment="Top">
+            <Grid Margin="0,117,3,41">
                 <Grid.RowDefinitions>
                     <RowDefinition/>
                     <RowDefinition/>

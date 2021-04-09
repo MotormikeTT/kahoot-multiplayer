@@ -7,6 +7,7 @@
  */
 
 using System;
+using System.Linq;
 using System.Windows;
 using System.ServiceModel;  // WCF  types
 using KahootLibrary;
@@ -90,8 +91,10 @@ namespace CardsGUIClient
                 }
                 else
                 {
-                    game.StartGame();
-                    txtPlayerName.IsEnabled = false;
+                    if (game.StartGame())
+                        txtPlayerName.IsEnabled = false;
+                    else
+                        MessageBox.Show("Wait until all players are ready", "Cannot start game!", MessageBoxButton.OK);
                 }
             }
             catch (Exception ex)
@@ -105,7 +108,7 @@ namespace CardsGUIClient
             try
             {
                 ///RUN SOMETHING
-                if (game.CheckAnswer((e.Source as Button).Content.ToString(), clientIdx, (int)time.TotalSeconds))
+                if (game.CheckAnswer(((e.Source as Button).Content as TextBlock).Text, clientIdx, (int)time.TotalSeconds))
                     labelResult.Text = "Correct Answer";
                 else
                     labelResult.Text = "Wrong Answer";
@@ -167,7 +170,7 @@ namespace CardsGUIClient
             }
         } // end txtTimePerQuestion_TextChanged()
 
-        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        private void Window_Closing(object sender, CancelEventArgs e)
         {
             game?.UnregisterFromCallbacks();
         }
@@ -213,10 +216,9 @@ namespace CardsGUIClient
                     labelResult.Text = "Choose your answer...";
                     disableAnswerButtons(false);
                     // get players and sort by points
-                    lstPlayers.ItemsSource = info.Players;
-                    CollectionView view = (CollectionView)CollectionViewSource.GetDefaultView(lstPlayers.ItemsSource);
-                    view.SortDescriptions.Add(new SortDescription("TotalPoints", ListSortDirection.Descending));
-                    view.Refresh();
+                    var sortedPlayers = info.Players.OrderByDescending(p => p.TotalPoints).ToArray();
+                    lstPlayers.ItemsSource = sortedPlayers;
+                    labelGameStatus.Text = $"Leading player: {sortedPlayers[0]}";
 
                     time = TimeSpan.FromSeconds(game.TimePerQuestion);
                     if (timer == null)
@@ -227,7 +229,8 @@ namespace CardsGUIClient
                             if (time == TimeSpan.Zero)
                             {
                                 timer.Stop();
-                                game.GetNextQuestion();
+                                if (info.GameHost)
+                                    game.GetNextQuestion();
                             }
                             time = time.Add(TimeSpan.FromSeconds(-1));
                         }, Application.Current.Dispatcher);
@@ -236,9 +239,9 @@ namespace CardsGUIClient
                 }
                 else
                 {
+                    labelResult.Text = $"The winner is: {info.Players.OrderByDescending(p => p.TotalPoints).ToArray()[0]}";
+                    labelResult.Text += "\nGame over.... Check player list for scores!";
                     // reset view to pre game content
-                    labelGameStatus.Text = "Game over.... Check player list for scores!";
-                    labelResult.Text = "Game over.... Check player list for scores!";
                     labelCurrentQuestion.Text = "Question?";
                     txtAnswerA.Text = "A";
                     txtAnswerB.Text = "B";
@@ -247,12 +250,8 @@ namespace CardsGUIClient
                     txtPlayerName.IsEnabled = true;
                     btnReady.IsEnabled = true;
                     disableAnswerButtons(true);
-                    // last player to join is the host
-                    if (clientIdx == (info.Players.Count - 1))
-                    {
-                        disableRuleControls(false);
+                    if(info.GameHost)
                         game.EndGame();
-                    }
                 }
             }
             else
@@ -273,18 +272,14 @@ namespace CardsGUIClient
                 txtTimePerQuestion.Text = info.TimePerQuestion.ToString();
                 txtTimer.Text = $"{TimeSpan.FromSeconds(info.TimePerQuestion).ToString("ss")} s";
                 comboCategories.Text = info.Category?.Replace("-", " ");
-                lstPlayers.ItemsSource = info.Players;
+                lstPlayers.ItemsSource = info.Players.OrderByDescending(p => p.TotalPoints);
                 disableAnswerButtons(true);
                 if (info.GameHost)
                 {
-                    labelGameStatus.Text = "You're the game host! Start game when eveyrone joins";
+                    labelGameStatus.Text = "You're the game host! Start game when everyone is ready";
                     btnStart.Visibility = Visibility.Visible;
                     btnReady.Visibility = Visibility.Hidden;
-                    btnStart.IsEnabled = true;
-                    sliderQuestions.IsEnabled = true;
-                    txtQuestionCount.IsEnabled = true;
-                    txtTimePerQuestion.IsEnabled = true;
-                    comboCategories.IsEnabled = true;
+                    disableRuleControls(false);
                 }
             }
             else
