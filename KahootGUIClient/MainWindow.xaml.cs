@@ -49,11 +49,7 @@ namespace CardsGUIClient
 
             // by default
             btnStart.Visibility = Visibility.Hidden;
-            sliderQuestions.IsEnabled = false;
-            txtQuestionCount.IsEnabled = false;
-            txtTimePerQuestion.IsEnabled = false;
-            txtTimer.IsEnabled = false;
-            comboCategories.IsEnabled = false;
+            disableRuleControls(true);
         } // end default C'tor
 
         private void btnReady_Click(object sender, RoutedEventArgs e)
@@ -95,6 +91,7 @@ namespace CardsGUIClient
                 else
                 {
                     game.StartGame();
+                    txtPlayerName.IsEnabled = false;
                 }
             }
             catch (Exception ex)
@@ -159,7 +156,7 @@ namespace CardsGUIClient
         {
             try
             {
-                if (game != null)
+                if (game != null && !string.IsNullOrEmpty((sender as TextBox).Text))
                 {
                     game.TimePerQuestion = int.Parse((sender as TextBox).Text);
                 }
@@ -175,13 +172,22 @@ namespace CardsGUIClient
             game?.UnregisterFromCallbacks();
         }
 
-        // Helper method
+        // Helper methods
         private void disableAnswerButtons(bool disable)
         {
             buttonAnswerA.IsEnabled = !disable;
             buttonAnswerB.IsEnabled = !disable;
             buttonAnswerC.IsEnabled = !disable;
             buttonAnswerD.IsEnabled = !disable;
+        }
+
+        private void disableRuleControls(bool disable)
+        {
+            btnStart.IsEnabled = !disable;
+            sliderQuestions.IsEnabled = !disable;
+            txtQuestionCount.IsEnabled = !disable;
+            txtTimePerQuestion.IsEnabled = !disable;
+            comboCategories.IsEnabled = !disable;
         }
 
         /// ICallback implementaion
@@ -193,20 +199,14 @@ namespace CardsGUIClient
             if (System.Threading.Thread.CurrentThread == this.Dispatcher.Thread)
             {
                 // disable rule controls
-                btnStart.IsEnabled = false;
-                txtPlayerName.IsEnabled = false;
-                sliderQuestions.IsEnabled = false;
-                txtQuestionCount.IsEnabled = false;
-                txtTimePerQuestion.IsEnabled = false;
-                txtTimer.IsEnabled = false;
-                comboCategories.IsEnabled = false;
+                disableRuleControls(true);
 
                 labelGameStatus.Text = $"Game started with category: {game.Category.Replace("-", " ")}";
                 labelCurrentQuestion.Text = info.Question.Sentence;
-                buttonAnswerA.Content = info.Question.Options[0];
-                buttonAnswerB.Content = info.Question.Options[1];
-                buttonAnswerC.Content = info.Question.Options[2];
-                buttonAnswerD.Content = info.Question.Options[3];
+                txtAnswerA.Text = info.Question.Options[0];
+                txtAnswerB.Text = info.Question.Options[1];
+                txtAnswerC.Text = info.Question.Options[2];
+                txtAnswerD.Text = info.Question.Options[3];
 
                 if (!info.EndGame)
                 {
@@ -236,8 +236,23 @@ namespace CardsGUIClient
                 }
                 else
                 {
+                    // reset view to pre game content
                     labelGameStatus.Text = "Game over.... Check player list for scores!";
                     labelResult.Text = "Game over.... Check player list for scores!";
+                    labelCurrentQuestion.Text = "Question?";
+                    txtAnswerA.Text = "A";
+                    txtAnswerB.Text = "B";
+                    txtAnswerC.Text = "C";
+                    txtAnswerD.Text = "D";
+                    txtPlayerName.IsEnabled = true;
+                    btnReady.IsEnabled = true;
+                    disableAnswerButtons(true);
+                    // last player to join is the host
+                    if (clientIdx == (info.Players.Count - 1))
+                    {
+                        disableRuleControls(false);
+                        game.EndGame();
+                    }
                 }
             }
             else
@@ -256,7 +271,7 @@ namespace CardsGUIClient
                 sliderQuestions.Value = info.NumQuestions;
                 txtQuestionCount.Text = $"{info.NumQuestions} Questions";
                 txtTimePerQuestion.Text = info.TimePerQuestion.ToString();
-                txtTimer.Text = $"{info.TimePerQuestion} s";
+                txtTimer.Text = $"{TimeSpan.FromSeconds(info.TimePerQuestion).ToString("ss")} s";
                 comboCategories.Text = info.Category?.Replace("-", " ");
                 lstPlayers.ItemsSource = info.Players;
                 disableAnswerButtons(true);
@@ -269,7 +284,6 @@ namespace CardsGUIClient
                     sliderQuestions.IsEnabled = true;
                     txtQuestionCount.IsEnabled = true;
                     txtTimePerQuestion.IsEnabled = true;
-                    txtTimer.IsEnabled = true;
                     comboCategories.IsEnabled = true;
                 }
             }

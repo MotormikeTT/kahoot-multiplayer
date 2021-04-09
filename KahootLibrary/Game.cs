@@ -1,18 +1,11 @@
 ﻿/*
- * Program:         CardsLibrary.dll
- * Module:          Shoe.cs
- * Author:          T. Haworth
- * Date:            March 9, 2021
- * Description:     Defines a WCF service contract called IShoe as well as 
- *                  a Shoe class that implements the service. This is just 
- *                  a slightly modified version of the earlier CardsLibrary 
- *                  example.
- *                  
- *                  Note that we had to add a reference to the .NET Framework 
- *                  assembly System.ServiceModel.dll.
- *                  
- * Modificatons:    
- */
+ * Program:         KahootLibrary.dll
+ * Module:          Game.cs
+ * Author:          George Moussa, Michael Mac Lean
+ * Date:            April 4, 2021
+ * Description:     Defines a WCF service contract called IGame as well as 
+ *                  a Game class that implements the service.
+*/
 
 using System;
 using System.Collections.Generic;
@@ -38,6 +31,8 @@ namespace KahootLibrary
     {
         [OperationContract(IsOneWay = true)]
         void StartGame();
+        [OperationContract(IsOneWay = true)]
+        void EndGame();
         [OperationContract]
         void GetNextQuestion();
         [OperationContract]
@@ -94,17 +89,23 @@ namespace KahootLibrary
 
         /*------------------ Public properties and methods -----------------*/
 
-        // Randomizes the sequence of the Cards in the cards collection
+        // Randomizes the sequence of the questions in the questions collection
         public void StartGame()
         {
-            // Randomize the cards collection
+            // Randomize the questions collection
+            populateQuestions();
             Random rng = new Random();
-            questions = questions.OrderBy(question => rng.Next()).ToList().GetRange(0, numQuestions);
+            questions = questions.OrderBy(question => rng.Next(0, 100).ToString()).ToList().GetRange(0, numQuestions);
 
-            // Reset the cards index
+            // Reset the question index
             questionIdx = 0;
 
             updateInGameInfo(false);
+        }
+
+        public void EndGame()
+        {
+            players.Clear();
         }
 
         // Returns a copy of the next Card in the cards collection

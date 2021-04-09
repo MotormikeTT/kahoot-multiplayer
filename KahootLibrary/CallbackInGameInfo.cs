@@ -1,18 +1,15 @@
 ﻿/*
- * Program:         CardsLibrary.dll
- * Module:          Shoe.cs
- * Author:          T. Haworth
- * Date:            March 9, 2021
- * Description:     Defines a WCF service contract called IShoe as well as 
- *                  a Shoe class that implements the service. This is just 
- *                  a slightly modified version of the earlier CardsLibrary 
- *                  example.
+ * Program:         KahootLibrary.dll
+ * Module:          CallbackInGameInfo.cs
+ * Author:          George Moussa, Michael Mac Lean
+ * Date:            April 4, 2021
+ * Description:     The CallbackInGameInfo class represents a WCF data contract for sending
+ *                  realtime in game updates to connected clients regarding changes to the 
+ *                  state of the Game (service object).
  *                  
- *                  Note that we had to add a reference to the .NET Framework 
- *                  assembly System.ServiceModel.dll.
- *                  
- * Modificatons:    
- */
+ *                  Note that we had to add a reference to the .NET assembly 
+ *                  System.Runtime.Serialization to create a DataContract.
+*/
 
 using System.Collections.Generic;
 using System.Runtime.Serialization;

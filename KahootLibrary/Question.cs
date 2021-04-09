@@ -1,22 +1,9 @@
 ﻿/*
- * Program:         CardsLibrary.dll
- * Module:          Card.cs
- * Date:            January 19, 2021
- * Author:          T. Haworth
- * Description:     The Card class represents a standard playing card. (complete)
- * 
- * Modifications:   Feb 2, 2021
- *                  Added the ICard interface which the card class implements.
- *                  Now hiding the Card class from external clients.
- *                  
- *                  Mar 16, 2021
- *                  Turned the Card class into a WCF data contract
- *                  and removed the ICard interface which we aren't using.
- *                  Note that the Card class needed to be made "public"
- *                  so that the client is now able to see it.
- *                  
- *                  Note that we had to add a reference to the .NET Framework 
- *                  assembly System.Runtime.Serialization.dll.
+ * Program:         KahootLibrary.dll
+ * Module:          Player.cs
+ * Author:          George Moussa, Michael Mac Lean
+ * Date:            April 4, 2021
+ * Description:     The Question class represents a Kahoot Question.
  */
 
 using System;
