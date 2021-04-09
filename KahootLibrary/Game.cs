@@ -16,7 +16,6 @@ using System.ServiceModel;  // WCF types
 
 namespace KahootLibrary
 {
-    //[ServiceContract]
     public interface ICallback
     {
         [OperationContract(IsOneWay = true)]
@@ -25,7 +24,7 @@ namespace KahootLibrary
         void UpdateInGame(CallbackInGameInfo info);
     }
 
-    // Converted IShoe to a WCF service contract
+    // Converted IGame to a WCF service contract
     [ServiceContract(CallbackContract = typeof(ICallback))]
     public interface IGame
     {
@@ -52,16 +51,16 @@ namespace KahootLibrary
 
     // The class that implements the service
     // ServiceBehavior is used here to select the desired instancing behaviour
-    // of the Shoe class
+    // of the Game class
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
     public class Game : IGame
     {
         /*------------------------ Member Variables ------------------------*/
 
-        private List<Question> questions = null;    // collection of cards
+        private List<Question> questions = null;    // collection of questions
         private List<Player> players = null;
-        private int questionIdx;                // index of the next card to be dealt
-        private int numQuestions;               // number of decks in the shoe
+        private int questionIdx;                // index of the next question to be dealt
+        private int numQuestions;               // number of questions in the game
         private int timePerQuestion;
         private string category;
         private List<string> categories;
@@ -108,7 +107,6 @@ namespace KahootLibrary
             players.Clear();
         }
 
-        // Returns a copy of the next Card in the cards collection
         public void GetNextQuestion()
         {
             bool endGame = false;
@@ -153,7 +151,7 @@ namespace KahootLibrary
             return -1;
         }
 
-        // Lets the client read or modify the number of decks in the shoe
+        // Lets the client read or modify the number of questions in the game
         public int NumQuestions
         {
             get
@@ -170,7 +168,7 @@ namespace KahootLibrary
             }
         }
 
-        // Lets the client read the number of cards remaining in the shoe
+        // Lets the client read the selected category
         public string Category
         {
             get
@@ -255,10 +253,7 @@ namespace KahootLibrary
             }
         }
 
-        // Uses the client callback objects to send current Shoe information 
-        // to clients. If the change in teh Shoe state was triggered by a method call 
-        // from a specific client, then that particular client will be excluded from
-        // the update since it will already be updated directly by the call.
+        // Uses the client callback objects to send current Game Rules information to clients.
         private void updateGameRules()
         {
             // Prepare the CallbackInfo parameter
@@ -269,10 +264,7 @@ namespace KahootLibrary
                 cb.UpdateGameRules(info);
         }
 
-        // Uses the client callback objects to send current Shoe information 
-        // to clients. If the change in teh Shoe state was triggered by a method call 
-        // from a specific client, then that particular client will be excluded from
-        // the update since it will already be updated directly by the call.
+        // Uses the client callback objects to send current In Game information to clients.
         private void updateInGameInfo(bool endGame)
         {
             // Prepare the CallbackInfo parameter
