@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="Kahoot!" Background="#e68d8a" Height="520" Width="750" ResizeMode="CanMinimize" WindowStartupLocation="CenterScreen" Closing="Window_Closing">
+        Title="Kahoot!" Background="#7EBCE6" Height="520" Width="750" ResizeMode="CanMinimize" WindowStartupLocation="CenterScreen" Closing="Window_Closing">
     <Grid RenderTransformOrigin="0.5,0.5">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="107*"/>
@@ -22,7 +22,7 @@
         <TextBox x:Name="txtTimer" HorizontalAlignment="Right" Height="20" Margin="0,74,18,0" TextWrapping="Wrap" Text="15s" VerticalAlignment="Top" Width="56" IsEnabled="False"/>
         <TextBlock x:Name="labelCurrentQuestion" Text="Question?" TextAlignment="Center" Height="112" Margin="46,117,48,0" VerticalAlignment="Top" TextWrapping="Wrap"/>
         <TextBlock x:Name="labelResult" Text="Choose your answer..." TextAlignment="Center" Margin="91,418,86,0" TextWrapping="Wrap" Height="38" VerticalAlignment="Top"/>
-        <GroupBox Height="366" Margin="21,99,18,0" VerticalAlignment="Top">
+        <GroupBox Height="366" Margin="21,99,18,0" VerticalAlignment="Top" Header="Question and Answers">
             <Grid Margin="0,117,3,41">
                 <Grid.RowDefinitions>
                     <RowDefinition/>
@@ -32,16 +32,16 @@
                     <ColumnDefinition/>
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
-                <Button x:Name="buttonAnswerA" Margin="10,19,10,13" Click="btnAnswer_Click">
+                <Button x:Name="buttonAnswerA" Margin="10,19,10,13" Click="btnAnswer_Click" Background="#E9CE2C">
                     <TextBlock x:Name="txtAnswerA" TextWrapping="Wrap" TextAlignment="Center" Width="157" Height="32">A</TextBlock>
                 </Button>
-                <Button x:Name="buttonAnswerB" Margin="10,19,10,13" Click="btnAnswer_Click" Grid.Column="1">
+                <Button x:Name="buttonAnswerB" Margin="10,19,10,13" Click="btnAnswer_Click" Grid.Column="1" Background="#e76f51">
                     <TextBlock x:Name="txtAnswerB" TextWrapping="Wrap" TextAlignment="Center" Width="157" Height="32">B</TextBlock>
                 </Button>
-                <Button x:Name="buttonAnswerC" Margin="10,9,10,19" Click="btnAnswer_Click" Grid.Row="1">
+                <Button x:Name="buttonAnswerC" Margin="10,9,10,19" Click="btnAnswer_Click" Grid.Row="1" Background="#e5383b">
                     <TextBlock x:Name="txtAnswerC" TextWrapping="Wrap" TextAlignment="Center" Width="157" Height="35">C</TextBlock>
                 </Button>
-                <Button x:Name="buttonAnswerD" Margin="10,9,10,19" Click="btnAnswer_Click" Grid.Column="1" Grid.Row="1">
+                <Button x:Name="buttonAnswerD" Margin="10,9,10,19" Click="btnAnswer_Click" Grid.Column="1" Grid.Row="1" Background="#e2afff">
                     <TextBlock x:Name="txtAnswerD" TextWrapping="Wrap" TextAlignment="Center" Width="157" Height="36">D</TextBlock>
                 </Button>
             </Grid>
@@ -63,7 +63,7 @@
             </Grid>
         </GroupBox>
         <Slider x:Name="sliderQuestions" IsSnapToTickEnabled="True" Grid.Column="1" HorizontalAlignment="Left" Margin="72,102,0,0" VerticalAlignment="Top" Width="186" Minimum="1" SmallChange="1" TickPlacement="BottomRight" ValueChanged="sliderQuestions_ValueChanged" Height="24"/>
-        <TextBox x:Name="txtQuestionCount" Grid.Column="1" Background="#e68d8a" HorizontalAlignment="Left" Height="23" Margin="120,126,0,0" TextWrapping="Wrap" Text="1 Question" VerticalAlignment="Top" Width="82" BorderThickness="0" HorizontalContentAlignment="Center"/>
+        <TextBox x:Name="txtQuestionCount" Grid.Column="1" Background="#7EBCE6" HorizontalAlignment="Left" Height="23" Margin="120,126,0,0" TextWrapping="Wrap" Text="1 Question" VerticalAlignment="Top" Width="82" BorderThickness="0" HorizontalContentAlignment="Center"/>
         <Label Content="Enter player name: " HorizontalAlignment="Left" Height="26" Margin="58,160,0,0" VerticalAlignment="Top" Width="112" Grid.Column="1" />
         <TextBox x:Name="txtPlayerName" Grid.Column="1" HorizontalAlignment="Left" Height="23" Margin="170,163,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="109" RenderTransformOrigin="0.5,0.5" />
 

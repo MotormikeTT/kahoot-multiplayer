@@ -16,6 +16,7 @@ using System.ServiceModel;  // WCF types
 
 namespace KahootLibrary
 {
+    // ICallback interface
     public interface ICallback
     {
         [OperationContract(IsOneWay = true)]
@@ -87,7 +88,7 @@ namespace KahootLibrary
 
         /*------------------ Public properties and methods -----------------*/
 
-        // Randomizes the sequence of the questions in the questions collection
+        // Randomizes the sequence of the questions in the questions collection and sets the number of questions to be used
         public bool StartGame()
         {
             // only start when all players are ready
@@ -97,7 +98,7 @@ namespace KahootLibrary
             // Randomize the questions collection
             populateQuestions();
             Random rng = new Random();
-            questions = questions.OrderBy(question => rng.Next(0, 100).ToString()).ToList().GetRange(0, numQuestions);
+            questions = questions.OrderBy(question => rng.Next(0, questions.Count).ToString()).ToList().GetRange(0, numQuestions);
 
             // Reset the question index
             questionIdx = 0;
@@ -106,12 +107,14 @@ namespace KahootLibrary
             return true;
         }
 
+        // Ends the game by clearing the player list and updating the game rules
         public void EndGame()
         {
             updateGameRules();
             players.Clear();
         }
 
+        // Gets the next question in the question list until there is no more
         public void GetNextQuestion()
         {
             bool endGame = false;
@@ -123,6 +126,7 @@ namespace KahootLibrary
             updateInGameInfo(endGame);
         }
 
+        // Checks to see if the user's chosen answer is correct and clculates their points if it is
         public bool CheckAnswer(string answer, int playerIndex, int time)
         {
             if (questions[questionIdx].Answer.Equals(answer))
@@ -134,12 +138,7 @@ namespace KahootLibrary
                 return false;
         }
 
-        /// <summary>
-        /// register newely added player
-        /// </summary>
-        /// <param name="playerName"></param>
-        /// <param name="startGame"></param>
-        /// <returns>player index</returns>
+        // Register newly added player
         public int RegisterPlayer(string playerName)
         {
             if (string.IsNullOrEmpty(playerName))
@@ -191,6 +190,7 @@ namespace KahootLibrary
             }
         }
 
+        // Lets the client read the categories availabel to choose
         public List<string> Categories
         {
             get
@@ -199,6 +199,7 @@ namespace KahootLibrary
             }
         }
 
+        // Lets the client read or modify the time allotted per question
         public int TimePerQuestion
         {
             get
@@ -215,6 +216,7 @@ namespace KahootLibrary
             }
         }
 
+        // Registers a client for callbacks
         public void RegisterForCallbacks()
         {
             // Identify which client is calling this method
@@ -227,6 +229,7 @@ namespace KahootLibrary
             updateGameRules();
         }
 
+        // Removes a client from being called back
         public void UnregisterFromCallbacks()
         {
             // Identify which client is calling this method
@@ -240,7 +243,7 @@ namespace KahootLibrary
 
         /*------------------------- Helper methods -------------------------*/
 
-        // Populates the cards attribute with Card objects
+        // Populates the questions attribute with Question objects
         private void populateQuestions()
         {
             string[] questionsArray = File.ReadAllText(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), $@".\categories\{category}.txt")).Split(new string[] { "#Q " }, StringSplitOptions.None);

@@ -19,6 +19,7 @@ namespace KahootLibrary
     [DataContract]
     public class CallbackInGameInfo
     {
+        // Properties
         [DataMember]
         public List<Player> Players { get; private set; }
         [DataMember]
@@ -28,6 +29,7 @@ namespace KahootLibrary
         [DataMember]
         public bool GameHost { get; private set; }
 
+        // Constructor
         public CallbackInGameInfo(List<Player> ps, Question q, bool e, bool gh)
         {
             Players = ps;

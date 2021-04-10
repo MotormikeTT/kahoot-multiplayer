@@ -11,11 +11,7 @@ using System.Runtime.Serialization; // WCF data contract types
 
 namespace KahootLibrary
 {
-    /*--------------------- Public type definitions --------------------*/
-
-
-
-    // The class definition is now invisible from outside the CardsLibrary assembly
+    // The class definition is now invisible from outside the KahootLibrary assembly
     [DataContract]
     public class Question
     {
@@ -36,7 +32,5 @@ namespace KahootLibrary
         public string Answer { get; private set; }
         [DataMember]
         public string[] Options { get; private set; }
-
-
     } // end Card class
 }

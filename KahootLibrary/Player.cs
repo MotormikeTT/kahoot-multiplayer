@@ -12,14 +12,11 @@ using System.Runtime.Serialization; // WCF data contract types
 
 namespace KahootLibrary
 {
-    /*--------------------- Public type definitions --------------------*/
-
-
-
-    // The class definition is now invisible from outside the CardsLibrary assembly
+    // The class definition is now invisible from outside the KahootLibrary assembly
     [DataContract]
     public class Player
     {
+        // Private Properties
         private List<int> points = new List<int>();
 
         /*-------------------------- Constructors --------------------------*/
@@ -37,29 +34,11 @@ namespace KahootLibrary
         [DataMember]
         public int TotalPoints { get; set; }
 
+        // Calculates the points to be awarded and the total points achieved thus far
         public void CalculatePoints(int time)
         {
             points?.Add(50 * time);
             TotalPoints = points.Aggregate((total, point) => total += point);
         }
-
-        public override string ToString()
-        {
-            return $"{Name} with {TotalPoints} point total";
-        }
-
-        public bool Equals(Player p)
-        {
-            return p.Name == Name;
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (!(obj is Player))
-                return false;
-
-            return (obj as Player).Name == Name;
-        }
-
     } // end Card class
 }

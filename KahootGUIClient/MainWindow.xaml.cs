@@ -53,6 +53,7 @@ namespace CardsGUIClient
             disableRuleControls(true);
         } // end default C'tor
 
+        // Ready button click event handler
         private void btnReady_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -77,6 +78,7 @@ namespace CardsGUIClient
             }
         } // end btnReady_Click()
 
+        // Start button click event handler
         private void btnStart_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -103,6 +105,7 @@ namespace CardsGUIClient
             }
         } // end btnStart_Click()
 
+        // Answer buttons click event handler
         private void btnAnswer_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -121,6 +124,7 @@ namespace CardsGUIClient
             }
         } // end btnAnswer_Click()
 
+        // Slider for number of questions event handler
         private void sliderQuestions_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             try
@@ -139,7 +143,7 @@ namespace CardsGUIClient
             }
         } // end sliderQuestions_ValueChanged()
 
-
+        // Combo box selection event handler
         private void comboCategories_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             try
@@ -155,6 +159,7 @@ namespace CardsGUIClient
             }
         } // end txtCategories_SelectionChanged()
 
+        // Text box for time per question event handler
         private void txtTimePerQuestion_TextChanged(object sender, TextChangedEventArgs e)
         {
             try
@@ -170,12 +175,15 @@ namespace CardsGUIClient
             }
         } // end txtTimePerQuestion_TextChanged()
 
+        // Window closing event handler
         private void Window_Closing(object sender, CancelEventArgs e)
         {
             game?.UnregisterFromCallbacks();
         }
 
         // Helper methods
+
+        // Disable all answer buttons
         private void disableAnswerButtons(bool disable)
         {
             buttonAnswerA.IsEnabled = !disable;
@@ -184,6 +192,7 @@ namespace CardsGUIClient
             buttonAnswerD.IsEnabled = !disable;
         }
 
+        // Disable all input components for the game rules
         private void disableRuleControls(bool disable)
         {
             btnStart.IsEnabled = !disable;
@@ -197,6 +206,7 @@ namespace CardsGUIClient
 
         private delegate void ClientUpdateInGameDelegate(CallbackInGameInfo info);
 
+        // Update the actual running game
         public void UpdateInGame(CallbackInGameInfo info)
         {
             if (System.Threading.Thread.CurrentThread == this.Dispatcher.Thread)
@@ -263,6 +273,7 @@ namespace CardsGUIClient
 
         private delegate void ClientUpdateGameRulesDelegate(CallbackGameRulesInfo info);
 
+        // Update game rules
         public void UpdateGameRules(CallbackGameRulesInfo info)
         {
             if (System.Threading.Thread.CurrentThread == this.Dispatcher.Thread)
