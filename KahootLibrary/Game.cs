@@ -190,7 +190,7 @@ namespace KahootLibrary
             }
         }
 
-        // Lets the client read the categories availabel to choose
+        // Lets the client read the categories available to choose
         public List<string> Categories
         {
             get
@@ -285,5 +285,5 @@ namespace KahootLibrary
                 cb.UpdateInGame(info);
             }
         }
-    } // end Shoe class
+    } // end Game class
 }

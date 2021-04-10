@@ -40,5 +40,18 @@ namespace KahootLibrary
             points?.Add(50 * time);
             TotalPoints = points.Aggregate((total, point) => total += point);
         }
-    } // end Card class
+
+        public override string ToString()
+        {
+            return $"{Name} with {TotalPoints} point total";
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (!(obj is Player))
+                return false;
+
+            return (obj as Player).Name == Name;
+        }
+    } // end Player class
 }

@@ -9,7 +9,7 @@
 
 using System;
 using System.ServiceModel;  // WCF types
-using KahootLibrary; // Shoe and IShoe types
+using KahootLibrary; // Game and IGame types
 
 namespace KahootServiceHost
 {

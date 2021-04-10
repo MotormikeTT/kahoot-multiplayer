@@ -32,5 +32,5 @@ namespace KahootLibrary
         public string Answer { get; private set; }
         [DataMember]
         public string[] Options { get; private set; }
-    } // end Card class
+    } // end Question class
 }
