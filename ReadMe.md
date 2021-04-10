@@ -1,7 +1,9 @@
 Kahoot Multiplayer - INFO-5060, Winter 2021
 --------------------------------------------------------------
 
-April 4, 2021
+Members of group project: 
+	1. George Moussa
+	2. Michael Mac Lean
 
 How to Run the Example:
 
