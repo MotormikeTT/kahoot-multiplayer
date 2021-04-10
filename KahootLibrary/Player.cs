@@ -41,11 +41,13 @@ namespace KahootLibrary
             TotalPoints = points.Aggregate((total, point) => total += point);
         }
 
+        // Overridden to string method to show the player name and total points
         public override string ToString()
         {
             return $"{Name} with {TotalPoints} point total";
         }
-
+        
+        // Overridden equals method to compare the player objects by name
         public override bool Equals(object obj)
         {
             if (!(obj is Player))
