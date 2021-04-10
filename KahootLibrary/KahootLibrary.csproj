@@ -47,6 +47,20 @@
     <Content Include="categories\**">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="categories\hobbies.txt" />
+    <Content Include="categories\humanities.txt" />
+    <Content Include="categories\literature.txt" />
+    <Content Include="categories\movies.txt" />
+    <Content Include="categories\music.txt" />
+    <Content Include="categories\newest.txt" />
+    <Content Include="categories\people.txt" />
+    <Content Include="categories\rated.txt" />
+    <Content Include="categories\religion-faith.txt" />
+    <Content Include="categories\science-technology.txt" />
+    <Content Include="categories\sports.txt" />
+    <Content Include="categories\television.txt" />
+    <Content Include="categories\video-games.txt" />
+    <Content Include="categories\world.txt" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CallbackGameRulesInfo.cs" />
