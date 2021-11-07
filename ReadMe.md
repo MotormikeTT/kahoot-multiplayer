@@ -1,6 +1,8 @@
 Kahoot Multiplayer - INFO-5060, Winter 2021
 --------------------------------------------------------------
 
+Kahoot type game that allows multiple users to play against eachother. Users can choose different categories and amount of questions.
+
 Members of group project: 
 	1. George Moussa
 	2. Michael Mac Lean
