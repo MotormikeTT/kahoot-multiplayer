@@ -17,3 +17,5 @@ How to Run the Example:
 3.	To execte multiple instances of the client it may work better to launch
 	the client outside of Visual Studio by double clicking on the file
 	KahootGUIClient\bin\Debug\KahootGUIClient.exe.
+	
+![image](https://user-images.githubusercontent.com/12501572/140637083-40ad2aaa-83e7-460d-9403-4a2eab87e457.png)
